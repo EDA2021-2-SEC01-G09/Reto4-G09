@@ -35,24 +35,55 @@ operación solicitada
 """
 
 def printMenu():
-    print("Bienvenido")
-    print("1- Cargar información en el catálogo")
-    print("2- ")
+    print('Bienvenido')
+    print('1- Crear catálogo')
+    print('2- Cargar información en el catálogo')
+    print('3- (Req 1) Encontrar puntos de interconexión aérea')
+    print('4- (Req 2) Encontrar clústeres de tráfico aéreo')
+    print('5- (Req 3) Encontrar la ruta más corta entre ciudades')
+    print('6- (Req 4) Utilizar las millas de viajero')
+    print('7- (Req 5) Cuantificar el efecto de un aeropuerto cerrado')
+    print('8- (Req 6) Comparar con servicio WEB externo')
+    print('0- Salir')
 
 catalog = None
 
 """
 Menu principal
 """
-while True:
+def UserProgram():
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
-    if int(inputs[0]) == 1:
-        print("Cargando información de los archivos ....")
+    while int(inputs[0]) != 0:
 
-    elif int(inputs[0]) == 2:
-        pass
+        if int(inputs[0]) == 1:
+            print("Creando catálogo ....")
 
-    else:
-        sys.exit(0)
-sys.exit(0)
+        elif int(inputs[0]) == 2:
+            print("Cargando información de los archivos ....")
+
+        elif int(inputs[0]) == 3:
+            print('Requerimiento 1')
+
+        elif int(inputs[0]) == 4:
+            print('Requerimiento 2')
+
+        elif int(inputs[0]) == 5:
+            print('Requerimiento 3')
+
+        elif int(inputs[0]) == 6:
+            print('Requerimiento 4')
+
+        elif int(inputs[0]) == 7:
+            print('Requerimiento 5')
+
+        elif int(inputs[0]) == 8:
+            print('Requerimiento 6')
+
+        else:
+            print('Ingrese una opción válida.')
+
+        printMenu()
+        inputs = input('Seleccione una opción para continuar\n')
+
+UserProgram()
