@@ -28,6 +28,7 @@ assert cf
 
 default_limit = 1000
 sys.setrecursionlimit(default_limit*10)
+
 ######################################################################################################################
 # Exposición de Resultados
 ######################################################################################################################
@@ -96,7 +97,7 @@ def UserProgram():
     while int(inputs[0]) != 7:
 
         if int(inputs[0]) == 0:
-            print('Existen 92605 rutas registradas en el archivo "routes_full.csv".')
+            print('Existen 92605 rutas registradas en "routes_full.csv".')
             routes_sample = int(input('Ingrese el número de rutas aéreas que deasea cargar: '))
             print('Creando catálogo ....')
             catalog = controller.Initialization()
@@ -130,6 +131,5 @@ def UserProgram():
     print('')
     print('Gracias por utilizar mi programa...')
     print('')
-
 
 UserProgram()

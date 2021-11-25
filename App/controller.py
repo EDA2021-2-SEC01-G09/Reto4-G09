@@ -19,13 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along withthis program.  If not, see <http://www.gnu.org/licenses/>.
  """
+ 
 import config as cf
 import model
 import csv
-
-from DISClib.ADT import graph as gp
-from DISClib.ADT import list as lt
-from DISClib.ADT import map as mp
 
 ######################################################################################################################
 # Inicialización del Catálogo
@@ -100,8 +97,9 @@ def LoadRoutes(catalog, routes_sample):
     return num_air_routes
 
 ######################################################################################################################
-
-
 # Funciones de ordenamiento
+######################################################################################################################
 
+######################################################################################################################
 # Funciones de consulta sobre el catálogo
+######################################################################################################################

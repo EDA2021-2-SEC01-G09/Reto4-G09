@@ -24,15 +24,13 @@
  * Dario Correal - Version inicial
  """
 
-
 import config as cf
-from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
+from DISClib.ADT import list as lt
 from DISClib.ADT import graph as gp
 from DISClib.DataStructures import bst as bst
-from DISClib.DataStructures import mapentry as me
 from math import radians, cos, sin, asin, sqrt
-
+from DISClib.DataStructures import mapentry as me
 assert cf
 
 ######################################################################################################################
@@ -146,7 +144,6 @@ def AddAirport(catalog, airport):
 
     return additional_cities, city['info']
 
-
 ######################################################################################################################
 
 def AddRoute(catalog, route):
@@ -182,7 +179,6 @@ def cmpFunction(key_1, key_2):
         return 0
 
 ######################################################################################################################
-
 
 def CalculateDistance(longitude_1, latitude_1, longitude_2, latitude_2):
     longitude_1 = radians(longitude_1)
