@@ -79,50 +79,47 @@ def PrintLoadingInfo(loading_info):
 def printMenu():
     print('')
     print('Bienvenido')
-    print('1- Crear catálogo')
-    print('2- Cargar información en el catálogo')
-    print('3- (Req 1) Encontrar puntos de interconexión aérea')
-    print('4- (Req 2) Encontrar clústeres de tráfico aéreo')
-    print('5- (Req 3) Encontrar la ruta más corta entre ciudades')
-    print('6- (Req 4) Utilizar las millas de viajero')
-    print('7- (Req 5) Cuantificar el efecto de un aeropuerto cerrado')
-    print('8- (Req 6) Comparar con servicio WEB externo')
-    print('0- Salir')
+    print('0- Cargar información en el catálogo')
+    print('1- (Req 1) Encontrar puntos de interconexión aérea')
+    print('2- (Req 2) Encontrar clústeres de tráfico aéreo')
+    print('3- (Req 3) Encontrar la ruta más corta entre ciudades')
+    print('4- (Req 4) Utilizar las millas de viajero')
+    print('5- (Req 5) Cuantificar el efecto de un aeropuerto cerrado')
+    print('6- (Req 6) Comparar con servicio WEB externo')
+    print('7- Salir')
 
 ######################################################################################################################
 
 def UserProgram():
     printMenu()
-    inputs = input('Seleccione una opción para continuar\n')
-    while int(inputs[0]) != 0:
+    inputs = input('Seleccione una opción para continuar:\n>')
+    while int(inputs[0]) != 7:
 
-        if int(inputs[0]) == 1:
-            print('Creando catálogo ....')
-            catalog = controller.Initialization()
-
-        elif int(inputs[0]) == 2:
+        if int(inputs[0]) == 0:
             print('Existen 92605 rutas registradas en el archivo "routes_full.csv".')
             routes_sample = int(input('Ingrese el número de rutas aéreas que deasea cargar: '))
+            print('Creando catálogo ....')
+            catalog = controller.Initialization()
             print('Cargando información de los archivos ....')
             loading_info = controller.LoadData(catalog, routes_sample)
             PrintLoadingInfo(loading_info)
 
-        elif int(inputs[0]) == 3:
+        elif int(inputs[0]) == 1:
             print('Requerimiento 1')
 
-        elif int(inputs[0]) == 4:
+        elif int(inputs[0]) == 2:
             print('Requerimiento 2')
 
-        elif int(inputs[0]) == 5:
+        elif int(inputs[0]) == 3:
             print('Requerimiento 3')
 
-        elif int(inputs[0]) == 6:
+        elif int(inputs[0]) == 4:
             print('Requerimiento 4')
 
-        elif int(inputs[0]) == 7:
+        elif int(inputs[0]) == 5:
             print('Requerimiento 5')
 
-        elif int(inputs[0]) == 8:
+        elif int(inputs[0]) == 6:
             print('Requerimiento 6')
 
         else:
@@ -130,5 +127,9 @@ def UserProgram():
 
         printMenu()
         inputs = input('Seleccione una opción para continuar\n')
+    print('')
+    print('Gracias por utilizar mi programa...')
+    print('')
+
 
 UserProgram()

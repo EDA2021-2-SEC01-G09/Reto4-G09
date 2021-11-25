@@ -126,12 +126,12 @@ def AddAirport(catalog, airport):
                 'lat': airport_latitude,
                 'lng': airport_longitude,
                 'country': airport_city_country,
-                'iso2': 'Unknown',
-                'iso3': 'Unknown',
+                'iso2': 'Desconocida',
+                'iso3': 'Desconocida',
                 'admin_name': airport_city_name,
                 'capital': airport_city_name,
-                'population': 0,
-                'id': 'Unknown'}
+                'population': 'Desconocida',
+                'id': 'Desconocida'}
         AddCity(catalog, city)
         city_key_list_values = mp.get(cities_map, airport_city_key)
         city_list_values = me.getValue(city_key_list_values)
