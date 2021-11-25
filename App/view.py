@@ -26,15 +26,58 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 
+default_limit = 1000
+sys.setrecursionlimit(default_limit*10)
+######################################################################################################################
+# Exposición de Resultados
+######################################################################################################################
 
-"""
-La vista se encarga de la interacción con el usuario
-Presenta el menu de opciones y por cada seleccion
-se hace la solicitud al controlador para ejecutar la
-operación solicitada
-"""
+def PrintLoadingInfo(loading_info):
+    print('')
+    num_airports = loading_info[0]
+    num_routes = loading_info[1]
+    num_cities = loading_info[2]
+    first_airport_info = loading_info[3]
+    last_city_info = loading_info[4]
+    print('Información de carga:')
+    print('Se cargaron dos grafos en los cuales los vértices son los aeropuertos y los arcos son las rutas aéreas.')
+    print('Los pesos de los arcos representan las distancias recorridas en cada ruta.')
+    print('Uno de los gráfos cargados es dirigido y el otro es no dirigido.')
+    print('Existen', num_airports, 'aeropuertos en el grafo difigido y no dirigido.')
+    print('Existen', num_routes, 'rutas en el grafo difigido y no dirigido.')
+    print('Existen', num_cities, 'ciudades registradas tanto en "worldcities.csv" como en "airports_full.csv".')
+    print('')
+    airport_name = first_airport_info['Name']
+    airport_city = first_airport_info['City']
+    airport_country = first_airport_info['Country']
+    airport_latitude = first_airport_info['Latitude']
+    airport_longitude = first_airport_info['Longitude']
+    print('=============== Primer Aeropuerto Cargado ===============')
+    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+' + 26*'-' + '+')
+    print('| {:^25}| {:^25}| {:^25}| {:^25}| {:^25}|'.format('Nombre', 'Ciudad', 'País', 'Latitud', 'Longitud'))
+    print('+' + 26*'=' + '+' + 26*'=' + '+' + 26*'='+ '+' + 26*'=' + '+' + 26*'=' + '+')
+    print('| {:^25}| {:^25}| {:^25}| {:^25}| {:^25}|'.format(airport_name, airport_city, airport_country, 
+                                                                            airport_latitude, airport_longitude))
+    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+' + 26*'-' + '+')
+    print('')
+    city_name = last_city_info['city']
+    city_population = last_city_info['population']
+    city_latitude = last_city_info['lat']
+    city_longitude = last_city_info['lng']
+    print('================= última Ciudad Cargada =================')
+    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+')
+    print('| {:^25}| {:^25}| {:^25}| {:^25}|'.format('Nombre', 'Población', 'Latitud', 'Longitud'))
+    print('+' + 26*'=' + '+' + 26*'=' + '+' + 26*'='+ '+' + 26*'=' + '+')
+    print('| {:^25}| {:^25}| {:^25}| {:^25}|'.format(city_name, city_population, city_latitude, 
+                                                                                                city_longitude))
+    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+')
+
+######################################################################################################################
+# Menú
+######################################################################################################################
 
 def printMenu():
+    print('')
     print('Bienvenido')
     print('1- Crear catálogo')
     print('2- Cargar información en el catálogo')
@@ -46,21 +89,23 @@ def printMenu():
     print('8- (Req 6) Comparar con servicio WEB externo')
     print('0- Salir')
 
-catalog = None
+######################################################################################################################
 
-"""
-Menu principal
-"""
 def UserProgram():
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
     while int(inputs[0]) != 0:
 
         if int(inputs[0]) == 1:
-            print("Creando catálogo ....")
+            print('Creando catálogo ....')
+            catalog = controller.Initialization()
 
         elif int(inputs[0]) == 2:
-            print("Cargando información de los archivos ....")
+            print('Existen 92605 rutas registradas en el archivo "routes_full.csv".')
+            routes_sample = int(input('Ingrese el número de rutas aéreas que deasea cargar: '))
+            print('Cargando información de los archivos ....')
+            loading_info = controller.LoadData(catalog, routes_sample)
+            PrintLoadingInfo(loading_info)
 
         elif int(inputs[0]) == 3:
             print('Requerimiento 1')
