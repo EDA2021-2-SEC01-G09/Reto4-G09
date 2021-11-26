@@ -35,18 +35,22 @@ sys.setrecursionlimit(default_limit*10)
 
 def PrintLoadingInfo(loading_info):
     print('')
-    num_airports = loading_info[0]
-    num_routes = loading_info[1]
-    num_cities = loading_info[2]
-    first_airport_info = loading_info[3]
-    last_city_info = loading_info[4]
-    print('Información de carga:')
+    num_cities = loading_info[0]
+    num_airports = loading_info[1]
+    num_routes_directed_graph = loading_info[2]
+    num_routes_undirected_graph = loading_info[3]
+    first_airport_info = loading_info[4]
+    last_city_info = loading_info[5]
+    print('================= Información de Carga =================')
     print('Se cargaron dos grafos en los cuales los vértices son los aeropuertos y los arcos son las rutas aéreas.')
+    print('En caso del grafo dirigido las rutas de ida y vuelta cuentan como un solo arco.')
+    print('En caso del grafo no dirigido solo se cuentan rutas de ida y vuelta y estas cuentan como un solo arco.')
     print('Los pesos de los arcos representan las distancias recorridas en cada ruta.')
     print('Uno de los gráfos cargados es dirigido y el otro es no dirigido.')
     print('Existen', num_airports, 'aeropuertos en el grafo difigido y no dirigido.')
-    print('Existen', num_routes, 'rutas en el grafo difigido y no dirigido.')
-    print('Existen', num_cities, 'ciudades registradas tanto en "worldcities.csv" como en "airports_full.csv".')
+    print('Existen', num_routes_directed_graph, 'rutas en el grafo difigido.')
+    print('Existen', num_routes_undirected_graph, 'rutas en el grafo no dirigido.')
+    print('Existen', num_cities, 'ciudades registradas en "worldcities.csv" y "airports_full.csv".')
     print('')
     airport_name = first_airport_info['Name']
     airport_city = first_airport_info['City']

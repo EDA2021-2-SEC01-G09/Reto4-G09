@@ -25,11 +25,11 @@
  """
 
 import config as cf
+from haversine import haversine
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as gp
 from DISClib.DataStructures import bst as bst
-from math import radians, cos, sin, asin, sqrt
 from DISClib.DataStructures import mapentry as me
 assert cf
 
@@ -108,8 +108,9 @@ def AddAirport(catalog, airport):
             city_latitude = float(city_info['lat'])
             city_longitude = float(city_info['lng'])
 
-            distance = CalculateDistance(airport_longitude, airport_latitude, 
-                                                                            city_longitude, city_latitude)
+            airport_coordinates = (airport_latitude, airport_longitude)
+            city_coordinates = (city_latitude, city_longitude)
+            distance = haversine(airport_coordinates, city_coordinates)
             if distance < min_distance:
                 min_distance = distance
                 nearest_city = city
@@ -155,12 +156,20 @@ def AddRoute(catalog, route):
     distance = float(route['distance_km'])
 
     gp.addEdge(directed_graph, departure_IATA, destination_IATA, distance)
-    gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
+
+    if gp.getEdge(directed_graph, destination_IATA, departure_IATA) != None:
+        gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
+        num_added_edges_directed_graph = 0
+        num_added_edges_undirected_graph = 1
+    else:
+        num_added_edges_directed_graph = 1
+        num_added_edges_undirected_graph = 0
+    
+    return num_added_edges_directed_graph, num_added_edges_undirected_graph
 
 ######################################################################################################################
 # Funciones para creacion de datos
 ######################################################################################################################
-
 
 ######################################################################################################################
 # Funciones de consulta
@@ -177,21 +186,6 @@ def cmpFunction(key_1, key_2):
         return -1
     else:
         return 0
-
-######################################################################################################################
-
-def CalculateDistance(longitude_1, latitude_1, longitude_2, latitude_2):
-    longitude_1 = radians(longitude_1)
-    latitude_1 = radians(latitude_1)
-    longitude_2 = radians(longitude_2)
-    latitude_2 = radians(latitude_2)
-
-    difference_longitude = longitude_2 - longitude_1 
-    difference_latitude = latitude_2 - latitude_1 
-    a = sin(difference_latitude/2)**2 + cos(latitude_1) * cos(latitude_2) * sin(difference_longitude/2)**2
-    c = 2 * asin(sqrt(a)) 
-    earth_radious_Km = 6371
-    return c * earth_radious_Km
 
 ######################################################################################################################
 # Funciones de ordenamiento

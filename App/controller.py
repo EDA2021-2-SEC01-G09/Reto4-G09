@@ -38,15 +38,18 @@ def Initialization():
 def LoadData(catalog, routes_sample):
     num_cities = LoadCities(catalog)
     info_airports = LoadAirports(catalog)
-    num_routes = LoadRoutes(catalog, routes_sample)
+    info_routes = LoadRoutes(catalog, routes_sample)
     
     num_airports = info_airports[0]
     total_additional_cities = info_airports[1]
     first_airport_info = info_airports[2]
     last_city_info = info_airports[3]
     total_num_cities = num_cities + total_additional_cities
+
+    num_routes_directed_graph = info_routes[0]
+    num_routes_undirected_graph = info_routes[1]
     
-    return num_airports, num_routes, total_num_cities, first_airport_info, last_city_info
+    return total_num_cities, num_airports, num_routes_directed_graph, num_routes_undirected_graph, first_airport_info, last_city_info
 
 ######################################################################################################################
 
@@ -89,12 +92,16 @@ def LoadRoutes(catalog, routes_sample):
     input_file = csv.DictReader(open(routes_data, encoding="utf-8"), delimiter=",")
     reduced_list = list(input_file)[:routes_sample]
 
-    num_air_routes = 0
+    num_routes_directed_graph = 0
+    num_routes_undirected_graph = 0
     for route in reduced_list:
-        model.AddRoute(catalog, route)
-        num_air_routes += 1
+        num_added_edges_info = model.AddRoute(catalog, route)
+        num_added_edges_directed_graph = num_added_edges_info[0]
+        num_added_edges_undirected_graph = num_added_edges_info[1]
+        num_routes_directed_graph += num_added_edges_directed_graph
+        num_routes_undirected_graph += num_added_edges_undirected_graph
 
-    return num_air_routes
+    return num_routes_directed_graph, num_routes_undirected_graph
 
 ######################################################################################################################
 # Funciones de ordenamiento
