@@ -65,10 +65,7 @@ def Initialization():
 def AddCity(catalog, city):
     cities_map = catalog['cities_map']
     city_BST = bst.newMap(cmpFunction)
-    city_name = city['city_ascii']
-    city_country = city['country']
-    city_key = city_name + '--' + city_country
-
+    city_key = city['city_ascii']
     city_value = {  'info': city,
                     'BST': city_BST}
 
@@ -93,7 +90,7 @@ def AddAirport(catalog, airport):
     airport_IATA = airport['IATA']
     airport_city_name = airport['City']
     airport_city_country = airport['Country']
-    airport_city_key = airport_city_name + '--' + airport_city_country
+    airport_city_key = airport_city_name
 
     airport_latitude = float(airport['Latitude'])
     airport_longitude = float(airport['Longitude'])
