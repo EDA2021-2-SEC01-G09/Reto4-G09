@@ -1,4 +1,4 @@
-﻿"""
+"""
  * Copyright 2020, Departamento de sistemas y Computación,
  * Universidad de Los Andes
  *
@@ -22,6 +22,7 @@
  
 import config as cf
 import model
+import time
 import csv
 
 ######################################################################################################################
@@ -29,13 +30,22 @@ import csv
 ######################################################################################################################
 
 def Initialization():
-    return model.Initialization()
+    start_time = time.process_time()
+
+    catalog = model.Initialization()
+
+    stop_time = time.process_time()
+    elapsed_time = (stop_time - start_time)*1000 
+
+    return elapsed_time, catalog
 
 ######################################################################################################################
 # Funciones para la carga de datos
 ######################################################################################################################
 
 def LoadData(catalog, routes_sample):
+    start_time = time.process_time()
+
     num_cities = LoadCities(catalog)
     info_airports = LoadAirports(catalog)
     info_routes = LoadRoutes(catalog, routes_sample)
@@ -48,8 +58,11 @@ def LoadData(catalog, routes_sample):
 
     num_routes_directed_graph = info_routes[0]
     num_routes_undirected_graph = info_routes[1]
+
+    stop_time = time.process_time()
+    elapsed_time = (stop_time - start_time)*1000 
     
-    return total_num_cities, num_airports, num_routes_directed_graph, num_routes_undirected_graph, first_airport_info, last_city_info
+    return elapsed_time, total_num_cities, num_airports, num_routes_directed_graph, num_routes_undirected_graph, first_airport_info, last_city_info
 
 ######################################################################################################################
 
@@ -113,3 +126,14 @@ def GetCitiesOptions(origin, destiny, catalog):
 ######################################################################################################################
 # Funciones de consulta sobre el catálogo
 ######################################################################################################################
+
+def Requirement1(catalog, num_airports):
+
+    start_time = time.process_time()
+
+    requirement_list = model.Requirement1(catalog, num_airports)
+
+    stop_time = time.process_time()
+    elapsed_time = (stop_time - start_time)*1000 
+
+    return elapsed_time, requirement_list

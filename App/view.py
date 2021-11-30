@@ -1,4 +1,4 @@
-﻿"""
+"""
  * Copyright 2020, Departamento de sistemas y Computación, Universidad
  * de Los Andes
  *
@@ -33,14 +33,14 @@ sys.setrecursionlimit(default_limit*10)
 ######################################################################################################################
 
 def PrintLoadingInfo(loading_info):
-    print('')
-    num_cities = loading_info[0]
-    num_airports = loading_info[1]
-    num_routes_directed_graph = loading_info[2]
-    num_routes_undirected_graph = loading_info[3]
-    first_airport_info = loading_info[4]
-    last_city_info = loading_info[5]
+    num_cities = loading_info[1]
+    num_airports = loading_info[2]
+    num_routes_directed_graph = loading_info[3]
+    num_routes_undirected_graph = loading_info[4]
+    first_airport_info = loading_info[5]
+    last_city_info = loading_info[6]
     print('================= Información de Carga =================')
+    print('')
     print('Se cargaron dos grafos en los cuales los vértices son los aeropuertos y los arcos son las rutas aéreas.')
     print('En caso del grafo dirigido las rutas de ida y vuelta cuentan como un solo arco.')
     print('En caso del grafo no dirigido solo se cuentan rutas de ida y vuelta y estas cuentan como un solo arco.')
@@ -57,6 +57,7 @@ def PrintLoadingInfo(loading_info):
     airport_latitude = first_airport_info['Latitude']
     airport_longitude = first_airport_info['Longitude']
     print('=============== Primer Aeropuerto Cargado ===============')
+    print('')
     print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+' + 26*'-' + '+')
     print('| {:^25}| {:^25}| {:^25}| {:^25}| {:^25}|'.format('Nombre', 'Ciudad', 'País', 'Latitud', 'Longitud'))
     print('+' + 26*'=' + '+' + 26*'=' + '+' + 26*'='+ '+' + 26*'=' + '+' + 26*'=' + '+')
@@ -69,6 +70,7 @@ def PrintLoadingInfo(loading_info):
     city_latitude = last_city_info['lat']
     city_longitude = last_city_info['lng']
     print('================= última Ciudad Cargada =================')
+    print('')
     print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+')
     print('| {:^25}| {:^25}| {:^25}| {:^25}|'.format('Nombre', 'Población', 'Latitud', 'Longitud'))
     print('+' + 26*'=' + '+' + 26*'=' + '+' + 26*'='+ '+' + 26*'=' + '+')
@@ -78,9 +80,31 @@ def PrintLoadingInfo(loading_info):
 
 ######################################################################################################################
 
+def PrintRequirement1(requirement_list, num_airports):
+    print('====== Aeropuertos por Número de Interconexiones ======')
+    print('')
+    print('Los primeros', num_airports, 'aeropuertos ordenados por número de interconexiones son:')
+    print('+' + 17*'-' + '+' + 6*'-'+ '+' + 71*'-' + '+' + 36*'-' + '+' + 36*'-' + '+')
+    print('| {:^16}| {:^5}| {:^70}| {:^35}| {:^35}|'.format('Interconexiones', 'IATA', 'Nombre', 'Ciudad', 'País'))
+    for airport in requirement_list:
+        num_interconnections = airport[0]
+        info_airport = airport[1]
+        country = info_airport['Country']
+        name = info_airport['Name']
+        IATA = info_airport['IATA']
+        city = info_airport['City']
+        print('+' + 17*'=' + '+' + 6*'='+ '+' + 71*'=' + '+' + 36*'=' + '+' + 36*'=' + '+')
+        print('| {:<16}| {:<5}| {:<70}| {:<35}| {:<35}|'.format(num_interconnections, IATA, name,
+                                                                                                city, country))
+
+    print('+' + 17*'-' + '+' + 6*'-'+ '+' + 71*'-' + '+' + 36*'-' + '+' + 36*'-' + '+')
+
+######################################################################################################################
+
 def PrintCitiesOptions(origin_options_list, destiny_options_list):
     print('')
     print('=================== Opciones de Origen ===================')
+    print('')
     origin_options_dict = {}
     counter = 1
     print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
@@ -98,9 +122,10 @@ def PrintCitiesOptions(origin_options_list, destiny_options_list):
         print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
         print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
                                                                                         longitude,  latitude, city_id))
-        print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+    
         origin_options_dict[counter] = origin_option
         counter += 1
+    print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
     
     origin_choise = int(input('Ingrese la ciudad que desea considerar como origen: '))
     choosen_origin = origin_options_dict[origin_choise]
@@ -123,9 +148,10 @@ def PrintCitiesOptions(origin_options_list, destiny_options_list):
         print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
         print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
                                                                                         longitude,  latitude, city_id))
-        print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+        
         destiny_options_dict[counter] = destiny_option
         counter += 1
+    print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
     
     destiny_choise = int(input('Ingrese la ciudad que desea considerar como destino: '))
     choosen_destiny = destiny_options_dict[destiny_choise]
@@ -154,19 +180,35 @@ def printMenu():
 def UserProgram():
     printMenu()
     inputs = input('Seleccione una opción para continuar:\n>')
+    print('')
     while int(inputs[0]) != 7:
 
         if int(inputs[0]) == 0:
             print('Existen 92605 rutas registradas en "routes_full.csv".')
             routes_sample = int(input('Ingrese el número de rutas aéreas que deasea cargar: '))
             print('Creando catálogo ....')
-            catalog = controller.Initialization()
+            initialization_info = controller.Initialization()
+            time_initialization = initialization_info[0]
+            catalog = initialization_info[1]
             print('Cargando información de los archivos ....')
             loading_info = controller.LoadData(catalog, routes_sample)
+            time_loading = loading_info[0]
+            time = time_initialization + time_loading
+            print('')
+            print('El carge de datos tardó', time, 'mseg en ejecutarse')
+            print('')
             PrintLoadingInfo(loading_info)
 
         elif int(inputs[0]) == 1:
-            print('Requerimiento 1')
+            num_airports = int(input('Elija el número de aeropuertos que desea ver: '))
+            print('Cargando resultados...')
+            requirement_info = controller.Requirement1(catalog, num_airports)
+            requirement_list = requirement_info[1]
+            time = requirement_info[0]
+            print('')
+            print('El requerimiento tardó', time, 'mseg en ejecutarse')
+            print('')
+            PrintRequirement1(requirement_list, num_airports)
 
         elif int(inputs[0]) == 2:
             print('Requerimiento 2')
@@ -193,11 +235,13 @@ def UserProgram():
             print('Requerimiento 6')
 
         else:
+            print('')
             print('Ingrese una opción válida.')
 
         printMenu()
         inputs = input('Seleccione una opción para continuar\n')
-    print('')
+        print('')
+        
     print('Gracias por utilizar mi programa...')
     print('')
 

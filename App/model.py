@@ -1,4 +1,4 @@
-﻿"""
+"""
  * Copyright 2020, Departamento de sistemas y Computación,
  * Universidad de Los Andes
  *
@@ -29,8 +29,9 @@ from haversine import haversine
 from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as gp
-from DISClib.DataStructures import bst as bst
+from DISClib.DataStructures import rbt
 from DISClib.DataStructures import mapentry as me
+from DISClib.Algorithms.Trees.traversal import inorder
 assert cf
 
 ######################################################################################################################
@@ -55,6 +56,7 @@ def Initialization():
 
     catalog['cities_map'] = mp.newMap(42739, maptype='PROBING', loadfactor=0.5)
     catalog['airports_map'] = mp.newMap(9075, maptype='PROBING', loadfactor=0.5)
+    catalog['airports_list'] = lt.newList('ARRAY_LIST')
 
     return catalog
 
@@ -64,10 +66,10 @@ def Initialization():
 
 def AddCity(catalog, city):
     cities_map = catalog['cities_map']
-    city_BST = bst.newMap(cmpFunction)
+    city_RBT = rbt.newMap(minorcmpFunction)
     city_key = city['city_ascii']
     city_value = {  'info': city,
-                    'BST': city_BST}
+                    'RBT': city_RBT}
 
     if mp.contains(cities_map, city_key):
         city_key_list_values = mp.get(cities_map, city_key)
@@ -81,21 +83,21 @@ def AddCity(catalog, city):
 ######################################################################################################################
 
 def AddAirport(catalog, airport):
-    directed_graph = catalog['directed_graph']
     undirected_graph = catalog['undirected_graph']
+    directed_graph = catalog['directed_graph']
+    airports_list = catalog['airports_list'] 
     airports_map = catalog['airports_map']
-    cities_map = catalog['cities_map']
+    cities_map = catalog['cities_map']  
     additional_cities = 0
 
     airport_IATA = airport['IATA']
     airport_city_name = airport['City']
     airport_city_country = airport['Country']
-    airport_city_key = airport_city_name
 
     airport_latitude = float(airport['Latitude'])
     airport_longitude = float(airport['Longitude'])
-    if mp.contains(cities_map, airport_city_key):
-        city_key_list_values = mp.get(cities_map, airport_city_key)
+    if mp.contains(cities_map, airport_city_name):
+        city_key_list_values = mp.get(cities_map, airport_city_name)
         city_list_values = me.getValue(city_key_list_values)
 
         nearest_city = None
@@ -112,8 +114,8 @@ def AddAirport(catalog, airport):
                 min_distance = distance
                 nearest_city = city
         
-        nearest_city_BST = nearest_city['BST']
-        bst.put(nearest_city_BST, distance, airport)
+        nearest_city_RBT = nearest_city['RBT']
+        rbt.put(nearest_city_RBT, distance, airport)
         city = {'info': None}
 
     else:
@@ -129,13 +131,15 @@ def AddAirport(catalog, airport):
                 'population': 'Desconocida',
                 'id': 'Desconocida'}
         AddCity(catalog, city)
-        city_key_list_values = mp.get(cities_map, airport_city_key)
+        city_key_list_values = mp.get(cities_map, airport_city_name)
         city_list_values = me.getValue(city_key_list_values)
         city = lt.getElement(city_list_values, 1)
-        city_BST = city['BST']
-        bst.put(city_BST, 0, airport)
+        city_RBT = city['RBT']
+        rbt.put(city_RBT, 0, airport)
         additional_cities += 1
 
+    element = (airport_IATA, airport)
+    lt.addLast(airports_list, element)
     mp.put(airports_map, airport_IATA, airport)
     gp.insertVertex(directed_graph, airport_IATA)
     gp.insertVertex(undirected_graph, airport_IATA)
@@ -185,17 +189,42 @@ def GetCitiesOptions(origin, destiny, catalog):
 # Funciones de consulta
 ######################################################################################################################
 
+def Requirement1(catalog, num_airports):
+    directed_graph = catalog['directed_graph']
+    airports_list = catalog['airports_list']
+    interconnections_RBT = rbt.newMap(majorcmpFunction)
+
+    for airport in lt.iterator(airports_list):
+        information = airport[1]
+        IATA = airport[0]
+        list_interconnections = gp.adjacents(directed_graph, IATA)
+        num_interconnections = lt.size(list_interconnections)
+        element = num_interconnections, information
+        rbt.put(interconnections_RBT, num_interconnections, element)
+
+    initial_requirement_list = inorder(interconnections_RBT)
+    final_requirement_list = lt.subList(initial_requirement_list, 1, num_airports)
+    requirement_list = lt.iterator(final_requirement_list)
+
+    return requirement_list
+    
 ######################################################################################################################
 # Funciones utilizadas para comparar elementos dentro de una lista
 ######################################################################################################################
 
-def cmpFunction(key_1, key_2):
-    if key_1 > key_2:
+def minorcmpFunction(key_1, key_2):
+    if key_1 >= key_2:
         return 1
-    elif key_1 < key_2:
-        return -1
     else:
-        return 0
+        return -1
+
+######################################################################################################################
+
+def majorcmpFunction(key_1, key_2):
+    if key_1 <= key_2:
+        return 1
+    else:
+        return -1
 
 ######################################################################################################################
 # Funciones de ordenamiento
