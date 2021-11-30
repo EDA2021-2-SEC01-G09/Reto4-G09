@@ -104,8 +104,11 @@ def LoadRoutes(catalog, routes_sample):
     return num_routes_directed_graph, num_routes_undirected_graph
 
 ######################################################################################################################
-# Funciones de ordenamiento
+# Funciones para creacion de datos
 ######################################################################################################################
+
+def GetCitiesOptions(origin, destiny, catalog):
+    return model.GetCitiesOptions(origin, destiny, catalog)
 
 ######################################################################################################################
 # Funciones de consulta sobre el catálogo

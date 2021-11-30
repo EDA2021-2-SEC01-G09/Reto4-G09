@@ -21,9 +21,8 @@
  """
 
 import config as cf
-import sys
 import controller
-from DISClib.ADT import list as lt
+import sys
 assert cf
 
 default_limit = 1000
@@ -78,6 +77,63 @@ def PrintLoadingInfo(loading_info):
     print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+')
 
 ######################################################################################################################
+
+def PrintCitiesOptions(origin_options_list, destiny_options_list):
+    print('')
+    print('=================== Opciones de Origen ===================')
+    origin_options_dict = {}
+    counter = 1
+    print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Opción', 'Nombre', 'Provincia/Estado', 'País',  
+                                                                                            'Longitud', 'Latitud', 'ID'))
+    for origin_option in origin_options_list:
+        information = origin_option['info']
+        state_province = information['admin_name']
+        country = information['country']
+        longitude = information['lng']
+        latitude = information['lat']
+        city_id = information['id']
+        name = information['city']
+        
+        print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
+        print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
+                                                                                        longitude,  latitude, city_id))
+        print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+        origin_options_dict[counter] = origin_option
+        counter += 1
+    
+    origin_choise = int(input('Ingrese la ciudad que desea considerar como origen: '))
+    choosen_origin = origin_options_dict[origin_choise]
+    print('')
+    print('=================== Opciones de Destino ===================')
+    destiny_options_dict = {}
+    counter = 1
+    print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Opción', 'Nombre', 'Provincia/Estado', 'País',  
+                                                                                            'Longitud', 'Latitud', 'ID'))
+    for destiny_option in destiny_options_list:
+        information = destiny_option['info']
+        state_province = information['admin_name']
+        country = information['country']
+        longitude = information['lng']
+        latitude = information['lat']
+        city_id = information['id']
+        name = information['city']
+        
+        print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
+        print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
+                                                                                        longitude,  latitude, city_id))
+        print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+        destiny_options_dict[counter] = destiny_option
+        counter += 1
+    
+    destiny_choise = int(input('Ingrese la ciudad que desea considerar como destino: '))
+    choosen_destiny = destiny_options_dict[destiny_choise]
+
+    return choosen_origin, choosen_destiny
+
+
+######################################################################################################################
 # Menú
 ######################################################################################################################
 
@@ -116,7 +172,16 @@ def UserProgram():
             print('Requerimiento 2')
 
         elif int(inputs[0]) == 3:
-            print('Requerimiento 3')
+            origin = input('Ingrese la ciudad de origen (sin signos de puntuación): ')
+            destiny = input('Ingrese la ciudad de destino (sin signos de puntuación): ')
+            cities_options = controller.GetCitiesOptions(origin, destiny, catalog)
+            origin_options_list = cities_options[0]
+            destiny_options_list = cities_options[1]
+            choosen_cities = PrintCitiesOptions(origin_options_list, destiny_options_list)
+            choosen_origin = choosen_cities[0]
+            choosen_destiny = choosen_cities[1]
+            #controller.Requirement3(choosen_origin, choosen_destiny, catalog)
+            
 
         elif int(inputs[0]) == 4:
             print('Requerimiento 4')

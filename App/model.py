@@ -168,6 +168,19 @@ def AddRoute(catalog, route):
 # Funciones para creacion de datos
 ######################################################################################################################
 
+def GetCitiesOptions(origin, destiny, catalog):
+    cities_map = catalog['cities_map']
+    
+    origin_options_key_value = mp.get(cities_map, origin)
+    destiny_options_key_value = mp.get(cities_map, destiny)
+    origin_options_value = me.getValue(origin_options_key_value)
+    destiny_options_value = me.getValue(destiny_options_key_value)
+    origin_options_list = lt.iterator(origin_options_value)
+    destiny_options_list = lt.iterator(destiny_options_value)
+
+    return origin_options_list, destiny_options_list
+
+
 ######################################################################################################################
 # Funciones de consulta
 ######################################################################################################################
