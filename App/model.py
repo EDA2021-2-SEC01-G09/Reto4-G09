@@ -156,15 +156,28 @@ def AddRoute(catalog, route):
     destination_IATA = route['Destination']
     distance = float(route['distance_km'])
 
-    gp.addEdge(directed_graph, departure_IATA, destination_IATA, distance)
 
-    if gp.getEdge(directed_graph, destination_IATA, departure_IATA) != None:
-        gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
+    if gp.getEdge(directed_graph, departure_IATA, destination_IATA) != None:
         num_added_edges_directed_graph = 0
-        num_added_edges_undirected_graph = 1
+        if gp.getEdge(directed_graph, destination_IATA, departure_IATA) != None:
+            if gp.getEdge(undirected_graph, departure_IATA, destination_IATA) == None:
+                gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
+                num_added_edges_undirected_graph = 1
+            else:
+                num_added_edges_undirected_graph = 0
+        else:
+            num_added_edges_undirected_graph = 0
     else:
+        gp.addEdge(directed_graph, departure_IATA, destination_IATA, distance)
         num_added_edges_directed_graph = 1
-        num_added_edges_undirected_graph = 0
+        if gp.getEdge(directed_graph, destination_IATA, departure_IATA) != None:
+            if gp.getEdge(undirected_graph, departure_IATA, destination_IATA) == None:
+                gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
+                num_added_edges_undirected_graph = 1
+            else:
+                num_added_edges_undirected_graph = 0
+        else:
+            num_added_edges_undirected_graph = 0
     
     return num_added_edges_directed_graph, num_added_edges_undirected_graph
 
