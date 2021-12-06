@@ -30,6 +30,7 @@ from DISClib.ADT import map as mp
 from DISClib.ADT import list as lt
 from DISClib.ADT import graph as gp
 from DISClib.DataStructures import rbt
+from DISClib.Algorithms.Graphs import scc
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Trees.traversal import inorder
 assert cf
@@ -230,6 +231,25 @@ def Requirement1(catalog, num_airports):
 
     return requirement_list, num_connected_airports
     
+######################################################################################################################
+
+def Requirement2(catalog, airport_1, airport_2):
+    digraph = catalog['digraph']
+    airports_map = catalog['airports_map']
+
+    airports_info_list = lt.newList('ARRAY_LIST')
+    for airport in [airport_1, airport_2]:
+        airport_key_value = mp.get(airports_map, airport)
+        aiport_info = me.getValue(airport_key_value)
+        lt.addLast(airports_info_list, aiport_info)
+    airports_info_list = lt.iterator(airports_info_list)
+
+    SCC = scc.KosarajuSCC(digraph)
+    num_SCC = scc.connectedComponents(SCC)
+    answer = scc.stronglyConnected(SCC, airport_1, airport_2)
+
+    return airports_info_list, num_SCC, answer
+
 ######################################################################################################################
 # Funciones utilizadas para comparar elementos dentro de una lista
 ######################################################################################################################

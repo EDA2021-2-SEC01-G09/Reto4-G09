@@ -112,6 +112,35 @@ def PrintRequirement1(loading_info, num_top_airports, requirement_info):
 
 ######################################################################################################################
 
+def PrintRequirement2(requirement_info, airport_1, airport_2):
+    airports_info_list = requirement_info[1]
+    num_SCC = requirement_info[2]
+    answer = requirement_info[3]
+
+    print('=============== Req No. 2 Inputs ===============')
+    print('Airport-1 IATA code:', airport_1)
+    print('Airport-2 IATA code:', airport_2)
+    print('')
+    airports_names = []
+    for info_airport in airports_info_list:
+        country = info_airport['Country']
+        name = info_airport['Name']
+        IATA = info_airport['IATA']
+        city = info_airport['City']
+        print('+++ Airport IATA code:', IATA, '+++')
+        print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+        print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format('IATA', 'Name', 'City', 'Country'))
+        print('+' + 8*'='+ '+' + 51*'=' + '+' + 31*'=' + '+' + 31*'=' + '+')
+        print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format(IATA, name, city, country))
+        print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+        airports_names.append(name)
+    print('')
+    print('- Numbre of SCC in Airport-Route network:', num_SCC)
+    print("- Does the '" + airports_names[0] + "' and the '" + airports_names[1], "' belong together?")
+    print('- ANS:', answer)
+
+######################################################################################################################
+
 def PrintCitiesOptions(origin_options_list, destiny_options_list):
     print('')
     print('=================== Opciones de Origen ===================')
@@ -224,6 +253,12 @@ def UserProgram():
             airport_1 = input('Enter the IATA code of the first airport: ')
             airport_2 = input('Enter the IATA code of the second airport: ')
             print('Loading results...')
+            requirement_info = controller.Requirement2(catalog, airport_1, airport_2)
+            time = requirement_info[0]
+            print('')
+            print('The requirement took', time, 'mseg')
+            print('')
+            PrintRequirement2(requirement_info, airport_1, airport_2)
 
         elif int(inputs[0]) == 3:
             origin = input('Ingrese la ciudad de origen (sin signos de puntuación): ')

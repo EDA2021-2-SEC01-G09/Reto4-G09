@@ -145,3 +145,19 @@ def Requirement1(catalog, num_top_airports):
     elapsed_time = (stop_time - start_time)*1000 
 
     return elapsed_time, requirement_list, num_connected_airports
+
+######################################################################################################################
+
+def Requirement2(catalog, airport_1, airport_2):
+
+    start_time = time.process_time()
+
+    requirement_info = model.Requirement2(catalog, airport_1, airport_2)
+    airports_info_list = requirement_info[0]
+    num_SCC = requirement_info[1]
+    answer = requirement_info[2]
+
+    stop_time = time.process_time()
+    elapsed_time = (stop_time - start_time)*1000 
+
+    return elapsed_time, airports_info_list, num_SCC, answer
