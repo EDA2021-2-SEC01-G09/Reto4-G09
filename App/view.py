@@ -35,48 +35,48 @@ sys.setrecursionlimit(default_limit*10)
 def PrintLoadingInfo(loading_info):
     num_cities = loading_info[1]
     num_airports = loading_info[2]
-    num_routes_directed_graph = loading_info[3]
-    num_routes_undirected_graph = loading_info[4]
-    first_airport_info = loading_info[5]
-    last_city_info = loading_info[6]
-    print('================= Información de Carga =================')
+    num_routes_graph = loading_info[3]
+    num_routes_digraph = loading_info[4]
+    airports_info_list = loading_info[5]
+    cities_info_list = loading_info[6]
+    
+    print('=== Airports-Routes DiGraph ===')
+    print('Nodes:', num_airports, 'loaded airports.')
+    print('Edges:', num_routes_digraph, 'loaded routes.')
     print('')
-    print('Se cargaron dos grafos en los cuales los vértices son los aeropuertos y los arcos son las rutas aéreas.')
-    print('En caso del grafo dirigido las rutas de ida y vuelta cuentan como un solo arco.')
-    print('En caso del grafo no dirigido solo se cuentan rutas de ida y vuelta y estas cuentan como un solo arco.')
-    print('Los pesos de los arcos representan las distancias recorridas en cada ruta.')
-    print('Uno de los gráfos cargados es dirigido y el otro es no dirigido.')
-    print('Existen', num_airports, 'aeropuertos en el grafo difigido y no dirigido.')
-    print('Existen', num_routes_directed_graph, 'rutas en el grafo difigido.')
-    print('Existen', num_routes_undirected_graph, 'rutas en el grafo no dirigido.')
-    print('Existen', num_cities, 'ciudades registradas en "worldcities.csv" y "airports_full.csv".')
+    print('=== Airports-Routes Graph ===')
+    print('Nodes:', num_airports, 'loaded airports.')
+    print('Edges:', num_routes_graph, 'loaded routes.')
     print('')
-    airport_name = first_airport_info['Name']
-    airport_city = first_airport_info['City']
-    airport_country = first_airport_info['Country']
-    airport_latitude = first_airport_info['Latitude']
-    airport_longitude = first_airport_info['Longitude']
-    print('=============== Primer Aeropuerto Cargado ===============')
+    print('=== First & Last Airport loaded in the Graph and Digraph ===')
+    print('+' + 8*'-' + '+' + 51*'-' + '+' + 31*'-'+ '+' + 31*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print('| {:<7}| {:<50}| {:<30}| {:<30}| {:<14}| {:<14}|'.format('IATA', 'Name', 'City', 'Country',
+                                                                                        'Latitude', 'Longitude'))
+    print('+' + 8*'=' + '+' + 51*'=' + '+' + 31*'='+ '+' + 31*'=' + '+' + 15*'=' + '+' + 15*'=' + '+')
+    for airport in airports_info_list:
+        IATA = airport['IATA']
+        name = airport['Name']
+        city = airport['City']
+        country = airport['Country']
+        lat = airport['Latitude']
+        lon = airport['Longitude']
+        print('| {:<7}| {:<50}| {:<30}| {:<30}| {:<14}| {:<14}|'.format(IATA, name, city, country, lat, lon))
+        print('+' + 8*'-' + '+' + 51*'-' + '+' + 31*'-'+ '+' + 31*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
     print('')
-    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+' + 26*'-' + '+')
-    print('| {:^25}| {:^25}| {:^25}| {:^25}| {:^25}|'.format('Nombre', 'Ciudad', 'País', 'Latitud', 'Longitud'))
-    print('+' + 26*'=' + '+' + 26*'=' + '+' + 26*'='+ '+' + 26*'=' + '+' + 26*'=' + '+')
-    print('| {:^25}| {:^25}| {:^25}| {:^25}| {:^25}|'.format(airport_name, airport_city, airport_country, 
-                                                                            airport_latitude, airport_longitude))
-    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+' + 26*'-' + '+')
-    print('')
-    city_name = last_city_info['city']
-    city_population = last_city_info['population']
-    city_latitude = last_city_info['lat']
-    city_longitude = last_city_info['lng']
-    print('================= última Ciudad Cargada =================')
-    print('')
-    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+')
-    print('| {:^25}| {:^25}| {:^25}| {:^25}|'.format('Nombre', 'Población', 'Latitud', 'Longitud'))
-    print('+' + 26*'=' + '+' + 26*'=' + '+' + 26*'='+ '+' + 26*'=' + '+')
-    print('| {:^25}| {:^25}| {:^25}| {:^25}|'.format(city_name, city_population, city_latitude, 
-                                                                                                city_longitude))
-    print('+' + 26*'-' + '+' + 26*'-' + '+' + 26*'-'+ '+' + 26*'-' + '+')
+    print('== City Network ==')
+    print('The number of cities are:', num_cities)
+    print('First and Last City loaded in data structure.')
+    print('+' + 51*'-' + '+' + 31*'-' + '+' + 21*'-' + '+' + 21*'-' + '+' + 21*'-' + '+')
+    print('| {:<50}| {:<30}| {:>20}| {:>20}| {:>20}|'.format('city', 'country', 'lat', 'lon', 'population'))
+    print('+' + 51*'=' + '+' + 31*'=' + '+' + 21*'=' + '+' + 21*'=' + '+' + 21*'=' + '+')
+    for city in cities_info_list:
+        lat = city['lat']
+        lon = city['lng']
+        name = city['city_ascii']
+        country = city['country']
+        population = city['population']
+        print('| {:<50}| {:<30}| {:>20}| {:>20}| {:>20}|'.format(name, country, lat, lon, population))
+        print('+' + 51*'-' + '+' + 31*'-' + '+' + 21*'-' + '+' + 21*'-' + '+' + 21*'-' + '+')
 
 ######################################################################################################################
 
@@ -111,17 +111,17 @@ def PrintCitiesOptions(origin_options_list, destiny_options_list):
     print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Opción', 'Nombre', 'Provincia/Estado', 'País',  
                                                                                             'Longitud', 'Latitud', 'ID'))
     for origin_option in origin_options_list:
-        information = origin_option['info']
         state_province = information['admin_name']
+        information = origin_option['info']
         country = information['country']
-        longitude = information['lng']
-        latitude = information['lat']
         city_id = information['id']
         name = information['city']
+        lat = information['lat']
+        lon = information['lng']
         
         print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
         print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
-                                                                                        longitude,  latitude, city_id))
+                                                                                        lon,  lat, city_id))
     
         origin_options_dict[counter] = origin_option
         counter += 1

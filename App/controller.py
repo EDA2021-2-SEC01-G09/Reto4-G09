@@ -21,6 +21,9 @@
  """
  
 import config as cf
+from DISClib.ADT import map as mp
+from DISClib.ADT import list as lt
+from DISClib.ADT import graph as gp
 import model
 import time
 import csv
@@ -46,75 +49,78 @@ def Initialization():
 def LoadData(catalog, routes_sample):
     start_time = time.process_time()
 
-    num_cities = LoadCities(catalog)
-    info_airports = LoadAirports(catalog)
-    info_routes = LoadRoutes(catalog, routes_sample)
-    
-    num_airports = info_airports[0]
-    total_additional_cities = info_airports[1]
-    first_airport_info = info_airports[2]
-    last_city_info = info_airports[3]
-    total_num_cities = num_cities + total_additional_cities
+    info_cities = LoadCities(catalog)
+    cities_info_list = info_cities[0]
+    num_cities = info_cities[1]
 
-    num_routes_directed_graph = info_routes[0]
-    num_routes_undirected_graph = info_routes[1]
+    airports_info_list = LoadAirports(catalog)
+    
+    routes_info = LoadRoutes(catalog, routes_sample)
+
+
+    graph = catalog['graph']
+    num_airports = gp.numVertices(graph)
+    num_routes_graph = routes_info[0]
+    num_routes_digraph = routes_info[1]
 
     stop_time = time.process_time()
     elapsed_time = (stop_time - start_time)*1000 
-    
-    return elapsed_time, total_num_cities, num_airports, num_routes_directed_graph, num_routes_undirected_graph, first_airport_info, last_city_info
-
+  
+    return elapsed_time, num_cities, num_airports, num_routes_graph, num_routes_digraph, lt.iterator(airports_info_list), lt.iterator(cities_info_list)
 ######################################################################################################################
 
 def LoadCities(catalog):
-    cities_data = cf.data_dir + 'Data/worldcities.csv'
+    cities_data = cf.data_dir + 'Data/worldcities-utf8.csv'
     input_file = csv.DictReader(open(cities_data, encoding="utf-8"), delimiter=",")
+    file = list(input_file)
+
+    first_city = file[0]
+    cities_info_list = lt.newList('ARRAY_LIST')
+    lt.addLast(cities_info_list, first_city)
 
     num_cities = 0
-    for city in input_file:
+    for city in file:
         model.AddCity(catalog, city)
         num_cities += 1
+
+    lt.addLast(cities_info_list, city)
     
-    return num_cities
+    return cities_info_list, num_cities
 
 ######################################################################################################################
 
 def LoadAirports(catalog):
-    airports_data = cf.data_dir + 'Data/airports_full.csv'
+    airports_data = cf.data_dir + 'Data/airports-utf8-small.csv'
     input_file = csv.DictReader(open(airports_data, encoding="utf-8"), delimiter=",")
-    
-    num_airports = 0
-    total_additional_cities = 0
-    for airport in input_file:
-        airport_output = model.AddAirport(catalog, airport)
-        additional_cities = airport_output[0]
-        city_info = airport_output[1]
-        if city_info != None:
-            last_city_info = city_info
-        if num_airports == 0:
-            first_airport_info = airport
-        num_airports += 1
-        total_additional_cities += additional_cities
+    file = list(input_file)
 
-    return num_airports, total_additional_cities, first_airport_info, last_city_info
+    first_airport = file[0]
+    airports_info_list = lt.newList('ARRAY_LIST')
+    lt.addLast(airports_info_list, first_airport)
+    
+    for airport in file:
+        model.AddAirport(catalog, airport)
+
+    lt.addLast(airports_info_list, airport)
+
+    return airports_info_list
 
 ######################################################################################################################
 
 def LoadRoutes(catalog, routes_sample):
-    routes_data = cf.data_dir + 'Data/routes_full.csv'
+    routes_data = cf.data_dir + 'Data/routes-utf8-small.csv'
     input_file = csv.DictReader(open(routes_data, encoding="utf-8"), delimiter=",")
     reduced_list = list(input_file)[:routes_sample]
+    undirected_routes_map = mp.newMap(routes_sample, loadfactor=0.5)
 
-    num_routes_directed_graph = 0
-    num_routes_undirected_graph = 0
+    num_routes_graph = 0
+    num_routes_digraph = 0
     for route in reduced_list:
-        num_added_edges_info = model.AddRoute(catalog, route)
-        num_added_edges_directed_graph = num_added_edges_info[0]
-        num_added_edges_undirected_graph = num_added_edges_info[1]
-        num_routes_directed_graph += num_added_edges_directed_graph
-        num_routes_undirected_graph += num_added_edges_undirected_graph
+        add_num_routes_graph = model.AddRoute(catalog, route, undirected_routes_map)
+        num_routes_graph += add_num_routes_graph
+        num_routes_digraph += 1
 
-    return num_routes_directed_graph, num_routes_undirected_graph
+    return num_routes_graph, num_routes_digraph
 
 ######################################################################################################################
 # Funciones para creacion de datos

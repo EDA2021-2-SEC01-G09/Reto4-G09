@@ -39,18 +39,19 @@ assert cf
 ######################################################################################################################
 
 def Initialization():
-    catalog = { 'directed_graph': None,
-                'undirected_graph': None,
+    catalog = { 'graph': None,
+                'digraph': None,
                 'cities_map': None,
-                'airports_map': None}
+                'airports_map': None,
+                'airports_list': None}
 
-    catalog['directed_graph'] = gp.newGraph(datastructure='ADJ_LIST',
-                                            directed=True,
+    catalog['graph'] = gp.newGraph(datastructure='ADJ_LIST',
+                                            directed=False,
                                             size=9075,
                                             comparefunction=None)
 
-    catalog['undirected_graph'] = gp.newGraph(datastructure='ADJ_LIST',
-                                             directed=False,
+    catalog['digraph'] = gp.newGraph(datastructure='ADJ_LIST',
+                                             directed=True,
                                              size=9075,
                                              comparefunction=None)
 
@@ -65,37 +66,36 @@ def Initialization():
 ######################################################################################################################
 
 def AddCity(catalog, city):
-    cities_map = catalog['cities_map']
     city_RBT = rbt.newMap(minorcmpFunction)
-    city_key = city['city_ascii']
+    cities_map = catalog['cities_map']
+    city_name = city['city']
     city_value = {  'info': city,
                     'RBT': city_RBT}
 
-    if mp.contains(cities_map, city_key):
-        city_key_list_values = mp.get(cities_map, city_key)
-        city_list_values = me.getValue(city_key_list_values)
-        lt.addLast(city_list_values, city_value)
+    if mp.contains(cities_map, city_name):
+        city_key_values_list = mp.get(cities_map, city_name)
+        city_values_list = me.getValue(city_key_values_list)
+        lt.addLast(city_values_list, city_value)
     else:
-        city_list_values = lt.newList('ARRAY_LIST')
-        lt.addLast(city_list_values, city_value)
-        mp.put(cities_map, city_key, city_list_values)
+        city_values_list = lt.newList('ARRAY_LIST')
+        lt.addLast(city_values_list, city_value)
+        mp.put(cities_map, city_name, city_values_list)
 
 ######################################################################################################################
 
 def AddAirport(catalog, airport):
-    undirected_graph = catalog['undirected_graph']
-    directed_graph = catalog['directed_graph']
     airports_list = catalog['airports_list'] 
     airports_map = catalog['airports_map']
     cities_map = catalog['cities_map']  
-    additional_cities = 0
+    digraph = catalog['digraph']
+    graph = catalog['graph']
 
     airport_IATA = airport['IATA']
     airport_city_name = airport['City']
     airport_city_country = airport['Country']
 
-    airport_latitude = float(airport['Latitude'])
-    airport_longitude = float(airport['Longitude'])
+    airport_lat = float(airport['Latitude'])
+    airport_lon = float(airport['Longitude'])
     if mp.contains(cities_map, airport_city_name):
         city_key_list_values = mp.get(cities_map, airport_city_name)
         city_list_values = me.getValue(city_key_list_values)
@@ -104,11 +104,11 @@ def AddAirport(catalog, airport):
         min_distance = 5*(10**7)
         for city in lt.iterator(city_list_values):
             city_info = city['info']
-            city_latitude = float(city_info['lat'])
-            city_longitude = float(city_info['lng'])
+            city_lat = float(city_info['lat'])
+            city_lon = float(city_info['lng'])
 
-            airport_coordinates = (airport_latitude, airport_longitude)
-            city_coordinates = (city_latitude, city_longitude)
+            airport_coordinates = (airport_lat, airport_lon)
+            city_coordinates = (city_lat, city_lon)
             distance = haversine(airport_coordinates, city_coordinates)
             if distance < min_distance:
                 min_distance = distance
@@ -116,70 +116,83 @@ def AddAirport(catalog, airport):
         
         nearest_city_RBT = nearest_city['RBT']
         rbt.put(nearest_city_RBT, distance, airport)
-        city = {'info': None}
 
     else:
         city = {'city': airport_city_name,
                 'city_ascii': airport_city_name,
-                'lat': airport_latitude,
-                'lng': airport_longitude,
+                'lat': airport_lat,
+                'lng': airport_lon,
                 'country': airport_city_country,
-                'iso2': 'Desconocida',
-                'iso3': 'Desconocida',
+                'iso2': 'Not Available',
+                'iso3': 'Not Available',
                 'admin_name': airport_city_name,
                 'capital': airport_city_name,
-                'population': 'Desconocida',
-                'id': 'Desconocida'}
+                'population': 'Not Available',
+                'id': 'Not Available'}
         AddCity(catalog, city)
         city_key_list_values = mp.get(cities_map, airport_city_name)
         city_list_values = me.getValue(city_key_list_values)
         city = lt.getElement(city_list_values, 1)
         city_RBT = city['RBT']
         rbt.put(city_RBT, 0, airport)
-        additional_cities += 1
 
     element = (airport_IATA, airport)
     lt.addLast(airports_list, element)
     mp.put(airports_map, airport_IATA, airport)
-    gp.insertVertex(directed_graph, airport_IATA)
-    gp.insertVertex(undirected_graph, airport_IATA)
-
-    return additional_cities, city['info']
+    gp.insertVertex(digraph, airport_IATA)
+    gp.insertVertex(graph, airport_IATA)
 
 ######################################################################################################################
 
-def AddRoute(catalog, route):
-    directed_graph = catalog['directed_graph']
-    undirected_graph = catalog['undirected_graph']
+def AddRoute(catalog, route, undirected_routes_map):
+    digraph = catalog['digraph']
+    graph = catalog['graph']
 
     departure_IATA = route['Departure']
     destination_IATA = route['Destination']
     distance = float(route['distance_km'])
 
-
-    if gp.getEdge(directed_graph, departure_IATA, destination_IATA) != None:
-        num_added_edges_directed_graph = 0
-        if gp.getEdge(directed_graph, destination_IATA, departure_IATA) != None:
-            if gp.getEdge(undirected_graph, departure_IATA, destination_IATA) == None:
-                gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
-                num_added_edges_undirected_graph = 1
-            else:
-                num_added_edges_undirected_graph = 0
-        else:
-            num_added_edges_undirected_graph = 0
+    if gp.getEdge(digraph, departure_IATA, destination_IATA) == None:
+        gp.addEdge(digraph, departure_IATA, destination_IATA, distance)
+        if gp.getEdge(digraph, destination_IATA, departure_IATA) != None:
+            if gp.getEdge(graph, destination_IATA, departure_IATA) == None:
+                gp.addEdge(graph, destination_IATA, departure_IATA, distance)      
     else:
-        gp.addEdge(directed_graph, departure_IATA, destination_IATA, distance)
-        num_added_edges_directed_graph = 1
-        if gp.getEdge(directed_graph, destination_IATA, departure_IATA) != None:
-            if gp.getEdge(undirected_graph, departure_IATA, destination_IATA) == None:
-                gp.addEdge(undirected_graph, departure_IATA, destination_IATA, distance)
-                num_added_edges_undirected_graph = 1
+        if gp.getEdge(digraph, destination_IATA, departure_IATA) != None:
+            if gp.getEdge(graph, destination_IATA, departure_IATA) == None:
+                gp.addEdge(graph, destination_IATA, departure_IATA, distance)
+
+    forward_route = mp.get(undirected_routes_map, departure_IATA + destination_IATA)
+    backward_route = mp.get(undirected_routes_map, destination_IATA + departure_IATA)
+    if forward_route == None:
+        if backward_route != None:
+            backward_route_value = me.getValue(backward_route)
+            if backward_route_value >= 1:
+                mp.put(undirected_routes_map, destination_IATA + departure_IATA, backward_route_value - 1)
+                add_num_routes_graph = 1
             else:
-                num_added_edges_undirected_graph = 0
+                mp.put(undirected_routes_map, departure_IATA + destination_IATA, 1)
+                add_num_routes_graph = 1
         else:
-            num_added_edges_undirected_graph = 0
-    
-    return num_added_edges_directed_graph, num_added_edges_undirected_graph
+            mp.put(undirected_routes_map, departure_IATA + destination_IATA, 1)
+            add_num_routes_graph = 0       
+    else:
+        forward_route_value = me.getValue(forward_route)
+        if backward_route != None:
+            backward_route_value = me.getValue(backward_route)
+            if backward_route_value >= 1 and forward_route_value >= 1:
+                mp.put(undirected_routes_map, destination_IATA + departure_IATA, backward_route_value - 1)
+                mp.put(undirected_routes_map, departure_IATA + destination_IATA, forward_route_value - 1)
+                add_num_routes_graph = 1
+            else:
+                mp.put(undirected_routes_map, departure_IATA + destination_IATA, forward_route_value + 1)
+                add_num_routes_graph = 0
+        else:
+            mp.put(undirected_routes_map, departure_IATA + destination_IATA, forward_route_value + 1)
+            add_num_routes_graph = 0  
+
+    return add_num_routes_graph 
+                
 
 ######################################################################################################################
 # Funciones para creacion de datos
@@ -197,21 +210,21 @@ def GetCitiesOptions(origin, destiny, catalog):
 
     return origin_options_list, destiny_options_list
 
-
 ######################################################################################################################
 # Funciones de consulta
 ######################################################################################################################
 
 def Requirement1(catalog, num_airports):
-    directed_graph = catalog['directed_graph']
+    digraph = catalog['digraph']
     airports_list = catalog['airports_list']
     interconnections_RBT = rbt.newMap(majorcmpFunction)
 
     for airport in lt.iterator(airports_list):
         information = airport[1]
         IATA = airport[0]
-        list_interconnections = gp.adjacents(directed_graph, IATA)
-        num_interconnections = lt.size(list_interconnections)
+        airport_indegre = gp.indegree(digraph, IATA)
+        airport_outdegree = gp.outdegree(digraph, IATA)
+        num_interconnections = airport_indegre + airport_outdegree
         element = num_interconnections, information
         rbt.put(interconnections_RBT, num_interconnections, element)
 

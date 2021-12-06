@@ -22,8 +22,7 @@ BST = bst.newMap(cmpFunction)
 bst.put(BST, 1, 'a')
 bst.put(BST, 2, 'b')
 
-print(inorder(BST))
-'''
+
 graph = gp.newGraph(directed=True)
 gp.insertVertex(graph, '1')
 gp.insertVertex(graph, '2')
@@ -37,9 +36,12 @@ gp.insertVertex(graph, '9')
 
 
 gp.addEdge(graph, '1', '2', 1)
-gp.addEdge(graph, '2', '1', 4)
-gp.addEdge(graph, '2', '3', 2)
 gp.addEdge(graph, '1', '3', 4)
+gp.addEdge(graph, '4', '1', 2)
+gp.addEdge(graph, '5', '1', 4)
+
+print(gp.adjacentEdges(graph, '1'))
+'''
 search = initSearch(graph)
 prim_graph = prim(graph, search, '1')
 print(mp.get(prim_graph['edgeTo'], '3'))
