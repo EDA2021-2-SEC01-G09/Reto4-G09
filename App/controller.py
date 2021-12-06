@@ -133,13 +133,15 @@ def GetCitiesOptions(origin, destiny, catalog):
 # Funciones de consulta sobre el catálogo
 ######################################################################################################################
 
-def Requirement1(catalog, num_airports):
+def Requirement1(catalog, num_top_airports):
 
     start_time = time.process_time()
 
-    requirement_list = model.Requirement1(catalog, num_airports)
+    requirement_info = model.Requirement1(catalog, num_top_airports)
+    requirement_list = requirement_info[0]
+    num_connected_airports = requirement_info[1]
 
     stop_time = time.process_time()
     elapsed_time = (stop_time - start_time)*1000 
 
-    return elapsed_time, requirement_list
+    return elapsed_time, requirement_list, num_connected_airports

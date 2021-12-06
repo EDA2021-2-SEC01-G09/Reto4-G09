@@ -152,15 +152,8 @@ def AddRoute(catalog, route, undirected_routes_map):
     destination_IATA = route['Destination']
     distance = float(route['distance_km'])
 
-    if gp.getEdge(digraph, departure_IATA, destination_IATA) == None:
-        gp.addEdge(digraph, departure_IATA, destination_IATA, distance)
-        if gp.getEdge(digraph, destination_IATA, departure_IATA) != None:
-            if gp.getEdge(graph, destination_IATA, departure_IATA) == None:
-                gp.addEdge(graph, destination_IATA, departure_IATA, distance)      
-    else:
-        if gp.getEdge(digraph, destination_IATA, departure_IATA) != None:
-            if gp.getEdge(graph, destination_IATA, departure_IATA) == None:
-                gp.addEdge(graph, destination_IATA, departure_IATA, distance)
+    gp.addEdge(digraph, departure_IATA, destination_IATA, distance)
+    gp.addEdge(graph, destination_IATA, departure_IATA, distance)      
 
     forward_route = mp.get(undirected_routes_map, departure_IATA + destination_IATA)
     backward_route = mp.get(undirected_routes_map, destination_IATA + departure_IATA)
@@ -217,22 +210,25 @@ def GetCitiesOptions(origin, destiny, catalog):
 def Requirement1(catalog, num_airports):
     digraph = catalog['digraph']
     airports_list = catalog['airports_list']
-    interconnections_RBT = rbt.newMap(majorcmpFunction)
+    interconnections_RBT = rbt.newMap(Requirement1cmpFunction)
 
+    num_connected_airports = 0
     for airport in lt.iterator(airports_list):
         information = airport[1]
         IATA = airport[0]
         airport_indegre = gp.indegree(digraph, IATA)
         airport_outdegree = gp.outdegree(digraph, IATA)
         num_interconnections = airport_indegre + airport_outdegree
-        element = num_interconnections, information
-        rbt.put(interconnections_RBT, num_interconnections, element)
+        element = information, num_interconnections, airport_indegre, airport_outdegree
+        rbt.put(interconnections_RBT, (num_interconnections, airport_indegre, airport_outdegree), element)
+        if num_interconnections > 0:
+            num_connected_airports += 1
 
     initial_requirement_list = inorder(interconnections_RBT)
     final_requirement_list = lt.subList(initial_requirement_list, 1, num_airports)
     requirement_list = lt.iterator(final_requirement_list)
 
-    return requirement_list
+    return requirement_list, num_connected_airports
     
 ######################################################################################################################
 # Funciones utilizadas para comparar elementos dentro de una lista
@@ -249,6 +245,30 @@ def minorcmpFunction(key_1, key_2):
 def majorcmpFunction(key_1, key_2):
     if key_1 <= key_2:
         return 1
+    else:
+        return -1
+
+######################################################################################################################
+
+def Requirement1cmpFunction(key_1, key_2):
+    num_interconnections_1 = key_1[0]
+    num_interconnections_2 = key_2[0]
+    airport_indegre_1 = key_1[1]
+    airport_indegre_2 = key_2[1]
+    airport_outdegree_1 = key_1[2]
+    airport_outdegree_2 = key_2[2]
+    if num_interconnections_1 < num_interconnections_2:
+        return 1
+    elif num_interconnections_1 == num_interconnections_2:
+        if airport_indegre_1 < airport_indegre_2:
+            return 1
+        elif airport_indegre_1 == airport_indegre_2:
+            if airport_outdegree_1 <= airport_outdegree_2:
+                return 1
+            else:
+                return -1
+        else:
+            return -1
     else:
         return -1
 

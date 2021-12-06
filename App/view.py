@@ -80,24 +80,35 @@ def PrintLoadingInfo(loading_info):
 
 ######################################################################################################################
 
-def PrintRequirement1(requirement_list, num_airports):
-    print('====== Aeropuertos por Número de Interconexiones ======')
+def PrintRequirement1(loading_info, num_top_airports, requirement_info):
+    num_connected_airports = requirement_info[2]
+    requirement_list = requirement_info[1]
+    num_airports = loading_info[2]
+    print('=============== Req No. 1 Inputs ===============')
+    print('Most connectected airports in network (TOP ' + str(num_top_airports) + ')')
+    print('Number of airports in network:', num_airports)
     print('')
-    print('Los primeros', num_airports, 'aeropuertos ordenados por número de interconexiones son:')
-    print('+' + 17*'-' + '+' + 6*'-'+ '+' + 71*'-' + '+' + 36*'-' + '+' + 36*'-' + '+')
-    print('| {:^16}| {:^5}| {:^70}| {:^35}| {:^35}|'.format('Interconexiones', 'IATA', 'Nombre', 'Ciudad', 'País'))
+    print('=============== Req No. 1 Answer ===============')
+    print('Connected airports inside network:', num_connected_airports)
+    print('Top', num_top_airports, 'most connected airports...')
+    print('+' + 51*'-'+ '+' + 31*'-' + '+' + 31*'-' + '+' + 8*'-' + '+' + 16*'-' + '+' + 11*'-' + '+' + 11*'-' + '+')
+    print('| {:<50}| {:<30}| {:<30}| {:<7}| {:>15}| {:>10}| {:>10}|'.format('Name', 'City', 'Country', 'IATA',
+                                                                                'connections', 'inbound', 'outbound'))
     for airport in requirement_list:
-        num_interconnections = airport[0]
-        info_airport = airport[1]
+        info_airport = airport[0]
         country = info_airport['Country']
         name = info_airport['Name']
         IATA = info_airport['IATA']
         city = info_airport['City']
-        print('+' + 17*'=' + '+' + 6*'='+ '+' + 71*'=' + '+' + 36*'=' + '+' + 36*'=' + '+')
-        print('| {:<16}| {:<5}| {:<70}| {:<35}| {:<35}|'.format(num_interconnections, IATA, name,
-                                                                                                city, country))
+        num_interconnections = airport[1]
+        num_inbound = airport[2]
+        num_outbound = airport[3]  
+        
+        print('+' + 51*'='+ '+' + 31*'=' + '+' + 31*'=' + '+' + 8*'=' + '+' + 16*'=' + '+' + 11*'=' + '+' + 11*'=' + '+')
+        print('| {:<50}| {:<30}| {:<30}| {:<7}| {:>15}| {:>10}| {:>10}|'.format(name, city, country, IATA, 
+                                                                    num_interconnections, num_inbound, num_outbound))
 
-    print('+' + 17*'-' + '+' + 6*'-'+ '+' + 71*'-' + '+' + 36*'-' + '+' + 36*'-' + '+')
+    print('+' + 51*'-'+ '+' + 31*'-' + '+' + 31*'-' + '+' + 8*'-' + '+' + 16*'-' + '+' + 11*'-' + '+' + 11*'-' + '+')
 
 ######################################################################################################################
 
@@ -184,34 +195,35 @@ def UserProgram():
     while int(inputs[0]) != 7:
 
         if int(inputs[0]) == 0:
-            print('Existen 92605 rutas registradas en "routes_full.csv".')
-            routes_sample = int(input('Ingrese el número de rutas aéreas que deasea cargar: '))
-            print('Creando catálogo ....')
+            print('There exist 92605 routes registred in "routes_full.csv".')
+            routes_sample = int(input('Enter the number of routes to load: '))
+            print('Creating catalog ....')
             initialization_info = controller.Initialization()
             time_initialization = initialization_info[0]
             catalog = initialization_info[1]
-            print('Cargando información de los archivos ....')
+            print('Loading information from files ....')
             loading_info = controller.LoadData(catalog, routes_sample)
             time_loading = loading_info[0]
             time = time_initialization + time_loading
             print('')
-            print('El carge de datos tardó', time, 'mseg en ejecutarse')
+            print('Loading data took', time, 'mseg')
             print('')
             PrintLoadingInfo(loading_info)
 
         elif int(inputs[0]) == 1:
-            num_airports = int(input('Elija el número de aeropuertos que desea ver: '))
-            print('Cargando resultados...')
-            requirement_info = controller.Requirement1(catalog, num_airports)
-            requirement_list = requirement_info[1]
+            num_top_airports = int(input('Enter the number of most interconnected airports to expose: '))
+            print('Loading result...')
+            requirement_info = controller.Requirement1(catalog, num_top_airports)
             time = requirement_info[0]
             print('')
-            print('El requerimiento tardó', time, 'mseg en ejecutarse')
+            print('The requirement took', time, 'mseg')
             print('')
-            PrintRequirement1(requirement_list, num_airports)
+            PrintRequirement1(loading_info, num_top_airports, requirement_info)
 
         elif int(inputs[0]) == 2:
-            print('Requerimiento 2')
+            airport_1 = input('Enter the IATA code of the first airport: ')
+            airport_2 = input('Enter the IATA code of the second airport: ')
+            print('Loading results...')
 
         elif int(inputs[0]) == 3:
             origin = input('Ingrese la ciudad de origen (sin signos de puntuación): ')
