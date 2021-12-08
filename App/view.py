@@ -141,24 +141,22 @@ def PrintRequirement2(requirement_info, airport_1, airport_2):
 
 ######################################################################################################################
 
-def PrintCitiesOptions(origin_options_list, destiny_options_list):
-    print('')
-    print('=================== Opciones de Origen ===================')
-    print('')
+def PrintCitiesOptionsRequirement3(origin_options_list, destiny_options_list):
     origin_options_dict = {}
     counter = 1
+    print('=================== Departure Options ===================')
+    print('')
     print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
-    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Opción', 'Nombre', 'Provincia/Estado', 'País',  
-                                                                                            'Longitud', 'Latitud', 'ID'))
+    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Option', 'Name', 'Province/State',
+                                                                        'Country', 'Longitude', 'Latitude', 'ID'))
     for origin_option in origin_options_list:
-        state_province = information['admin_name']
         information = origin_option['info']
+        state_province = information['admin_name']
         country = information['country']
         city_id = information['id']
         name = information['city']
         lat = information['lat']
         lon = information['lng']
-        
         print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
         print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
                                                                                         lon,  lat, city_id))
@@ -167,15 +165,15 @@ def PrintCitiesOptions(origin_options_list, destiny_options_list):
         counter += 1
     print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
     
-    origin_choise = int(input('Ingrese la ciudad que desea considerar como origen: '))
+    origin_choise = int(input('Enter the departure city option: '))
     choosen_origin = origin_options_dict[origin_choise]
     print('')
-    print('=================== Opciones de Destino ===================')
+    print('=================== Destination Options ===================')
     destiny_options_dict = {}
     counter = 1
     print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
-    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Opción', 'Nombre', 'Provincia/Estado', 'País',  
-                                                                                            'Longitud', 'Latitud', 'ID'))
+    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Option', 'Name', 'Province/State',
+                                                                        'Country', 'Longitude', 'Latitude', 'ID'))
     for destiny_option in destiny_options_list:
         information = destiny_option['info']
         state_province = information['admin_name']
@@ -184,7 +182,6 @@ def PrintCitiesOptions(origin_options_list, destiny_options_list):
         latitude = information['lat']
         city_id = information['id']
         name = information['city']
-        
         print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
         print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
                                                                                         longitude,  latitude, city_id))
@@ -193,10 +190,187 @@ def PrintCitiesOptions(origin_options_list, destiny_options_list):
         counter += 1
     print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
     
-    destiny_choise = int(input('Ingrese la ciudad que desea considerar como destino: '))
+    destiny_choise = int(input('Enter the destination city option: '))
     choosen_destiny = destiny_options_dict[destiny_choise]
 
     return choosen_origin, choosen_destiny
+
+######################################################################################################################
+
+def PrintRequirement3(origin, destiny, requirement_info):
+    origin_airport_info = requirement_info[1]
+    destiny_airport_info = requirement_info[2]
+    distance = requirement_info[3]
+    trip_path_list = requirement_info[4]
+    trip_path_airports_list = requirement_info[5]
+    print('=============== Req No. 3 Inputs ===============')
+    print('Departure city:', origin)
+    print('Arrival city:', destiny)
+    print('')
+    print('=============== Req No. 3 Answer ===============')
+    print('+++ The departure airport in', origin, 'is +++')
+    country = origin_airport_info['Country']
+    name = origin_airport_info['Name']
+    IATA = origin_airport_info['IATA']
+    city = origin_airport_info['City']
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format('IATA', 'Name', 'City', 'Country'))
+    print('+' + 8*'='+ '+' + 51*'=' + '+' + 31*'=' + '+' + 31*'=' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format(IATA, name, city, country))
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('')
+    print('+++ The arrival airport in', destiny, 'is +++')
+    country = destiny_airport_info['Country']
+    name = destiny_airport_info['Name']
+    IATA = destiny_airport_info['IATA']
+    city = destiny_airport_info['City']
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format('IATA', 'Name', 'City', 'Country'))
+    print('+' + 8*'='+ '+' + 51*'=' + '+' + 31*'=' + '+' + 31*'=' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format(IATA, name, city, country))
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('')
+    print('Dijkstra´s trip detatails +++')
+    print('- Total distance:', distance)    
+    print('- Trip path: ')
+    print('+' + 15*'-'+ '+' + 15*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print('| {:<14}| {:<14}| {:<14}| {:>14}|'.format('Airline', 'Departure', 'Destination', 'distance_km'))
+    for path_info in trip_path_list:
+        airline = path_info['Airline']
+        departure = path_info['Departure']
+        destination = path_info['Destination']
+        distance = path_info['distance_km']
+        print('+' + 15*'='+ '+' + 15*'=' + '+' + 15*'=' + '+' + 15*'=' + '+')
+        print('| {:<14}| {:<14}| {:<14}| {:>14}|'.format(airline, departure, destination, distance))
+    print('+' + 15*'-'+ '+' + 15*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print('- Trip Stops:')
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format('IATA', 'Name', 'City', 'Country'))        
+    for airport_info in trip_path_airports_list:
+        country = airport_info['Country']
+        name = airport_info['Name']
+        IATA = airport_info['IATA']
+        city = airport_info['City']
+        print('+' + 8*'='+ '+' + 51*'=' + '+' + 31*'=' + '+' + 31*'=' + '+')
+        print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format(IATA, name, city, country))
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+
+######################################################################################################################
+
+def PrintCitiesOptionsRequirement4(cities_options):
+    city_options_dict = {}
+    counter = 1
+    print('=================== City Options ===================')
+    print('')
+    print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+    print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format('Option', 'Name', 'Province/State',
+                                                                        'Country', 'Longitude', 'Latitude', 'ID'))
+    for city_option in cities_options:
+        information = city_option['info']
+        state_province = information['admin_name']
+        country = information['country']
+        city_id = information['id']
+        name = information['city']
+        lat = information['lat']
+        lon = information['lng']
+        print('+' + 9*'=' + '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'='+ '+' + 25*'=' + '+' + 25*'=' + '+' + 25*'=' + '+')
+        print('| {:^8}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}| {:^24}|'.format(counter, name, state_province, country, 
+                                                                                        lon,  lat, city_id))
+    
+        city_options_dict[counter] = city_option
+        counter += 1
+    print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
+    
+    city_choise = int(input('Enter the departure city option: '))
+    choosen_city = city_options_dict[city_choise]
+
+    return choosen_city
+
+######################################################################################################################
+
+def PrintRequirement4(choosen_city, miles, requirement_info):
+    airport_info = requirement_info[1]
+    routes_path_list = requirement_info[2]
+    num_possible_airports = requirement_info[3]
+    max_traveling_distance = requirement_info[4]
+    longest_path_distance = requirement_info[5]
+    miles_need = requirement_info[6]
+    country = airport_info['Country']
+    name = airport_info['Name']
+    IATA = airport_info['IATA']
+    city = airport_info['City']
+    print('=============== Req No. 4 Inputs ===============')
+    print('City choise:', choosen_city['info']['city'])
+    print('Departure IATA code:', IATA)
+    print('AVaible Travel Miles:', miles)
+    print('')
+    print('=============== Req No. 4 Answer ===============')
+    print('+++ Departure Airport for IATA code:', IATA, '+++')
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format('IATA', 'Name', 'City', 'Country'))
+    print('+' + 8*'='+ '+' + 51*'=' + '+' + 31*'=' + '+' + 31*'=' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format(IATA, name, city, country))
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('')
+    print('- Number of possible airports:', num_possible_airports, '.')
+    print('- Max traveling distance between airports:', max_traveling_distance, '(km).')
+    print('- Passenger avalaible traveling miles:', miles*1.6, '(km).')
+    print('')
+    print("+++ Longest possible route with airport '" + IATA + "' +++")
+    print('- Longest possible path distance:', longest_path_distance, ' (km).')
+    print('- Longest possible path details:')
+    print('+' + 15*'-'+ '+' + 15*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print('| {:<14}| {:<14}| {:<14}| {:>14}|'.format('Airline', 'Departure', 'Destination', 'distance_km'))
+    for path_info in routes_path_list:
+        airline = path_info['Airline']
+        departure = path_info['Departure']
+        destination = path_info['Destination']
+        distance = path_info['distance_km']
+        print('+' + 15*'='+ '+' + 15*'=' + '+' + 15*'=' + '+' + 15*'=' + '+')
+        print('| {:<14}| {:<14}| {:<14}| {:>14}|'.format(airline, departure, destination, distance))
+    print('+' + 15*'-'+ '+' + 15*'-' + '+' + 15*'-' + '+' + 15*'-' + '+')
+    print('-----')
+    print('The passenger needs', miles_need, 'miles to complete the trip.')
+    print('-----')
+
+######################################################################################################################
+
+def PrintRequirement5(IATA, loading_info, requirement_info):
+    num_airports = loading_info[2]
+    num_routes_graph = loading_info[3]
+    num_routes_digraph = loading_info[4]
+    effected_airports_list = requirement_info[1]
+    resulting_num_routes_digraph = requirement_info[2]
+    resulting_num_routes_graph = requirement_info[3]
+    affected_airports = requirement_info[4]
+    print('=============== Req No. 5 Inputs ===============')
+    print('Closing the airport with IATA code:', IATA)
+    print('')
+    print('--- Airports-Routes DiGraph ---')
+    print('Original number of Airports:', num_airports, 'and Routes:', num_routes_digraph)
+    print('--- Airports-Routes Graph ---')
+    print('Original number of Airports:', num_airports, 'and Routes:', num_routes_graph)
+    print('')
+    print('+++ Removing Airports with IATA:', IATA, '+++')
+    print('')
+    print('--- Airports-Routes DiGraph ---')
+    print('Resulting number of Airports:', num_airports - 1, 'and Routes:', num_routes_digraph - resulting_num_routes_digraph)
+    print('--- Airports-Routes Graph ---')
+    print('Resulting number of Airports:', num_airports - 1, 'and Routes:', num_routes_graph - resulting_num_routes_graph)
+    print('')
+    print('=============== Req No. 5 Answer ===============')
+    print('There are', affected_airports, 'Airports affected by the removal of', IATA)
+    print('The first & last 3 Airports affected are:')
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
+    print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format('IATA', 'Name', 'City', 'Country'))     
+    for airport_info in effected_airports_list:
+        country = airport_info['Country']
+        name = airport_info['Name']
+        IATA = airport_info['IATA']
+        city = airport_info['City']
+        print('+' + 8*'='+ '+' + 51*'=' + '+' + 31*'=' + '+' + 31*'=' + '+')
+        print('| {:>7}| {:>50}| {:>30}| {:>30}|'.format(IATA, name, city, country))
+    print('+' + 8*'-'+ '+' + 51*'-' + '+' + 31*'-' + '+' + 31*'-' + '+')
 
 
 ######################################################################################################################
@@ -219,11 +393,10 @@ def printMenu():
 
 def UserProgram():
     printMenu()
-    inputs = input('Seleccione una opción para continuar:\n>')
+    inputs = int(input('Seleccione una opción para continuar:\n>'))
     print('')
-    while int(inputs[0]) != 7:
-
-        if int(inputs[0]) == 0:
+    while inputs != 7:
+        if inputs == 0:
             print('There exist 92605 routes registred in "routes_full.csv".')
             routes_sample = int(input('Enter the number of routes to load: '))
             print('Creating catalog ....')
@@ -239,7 +412,7 @@ def UserProgram():
             print('')
             PrintLoadingInfo(loading_info)
 
-        elif int(inputs[0]) == 1:
+        elif inputs == 1:
             num_top_airports = int(input('Enter the number of most interconnected airports to expose: '))
             print('Loading result...')
             requirement_info = controller.Requirement1(catalog, num_top_airports)
@@ -249,7 +422,7 @@ def UserProgram():
             print('')
             PrintRequirement1(loading_info, num_top_airports, requirement_info)
 
-        elif int(inputs[0]) == 2:
+        elif inputs == 2:
             airport_1 = input('Enter the IATA code of the first airport: ')
             airport_2 = input('Enter the IATA code of the second airport: ')
             print('Loading results...')
@@ -260,25 +433,44 @@ def UserProgram():
             print('')
             PrintRequirement2(requirement_info, airport_1, airport_2)
 
-        elif int(inputs[0]) == 3:
-            origin = input('Ingrese la ciudad de origen (sin signos de puntuación): ')
-            destiny = input('Ingrese la ciudad de destino (sin signos de puntuación): ')
-            cities_options = controller.GetCitiesOptions(origin, destiny, catalog)
+        elif inputs == 3:
+            origin = input('Enter the departure city: ')
+            destiny = input('Enter the destination city: ')
+            print('Loading results...')
+            cities_options = controller.GetCitiesOptionsRequirement3(catalog, origin, destiny)
             origin_options_list = cities_options[0]
             destiny_options_list = cities_options[1]
-            choosen_cities = PrintCitiesOptions(origin_options_list, destiny_options_list)
-            choosen_origin = choosen_cities[0]
-            choosen_destiny = choosen_cities[1]
-            #controller.Requirement3(choosen_origin, choosen_destiny, catalog)
-            
+            choosen_cities = PrintCitiesOptionsRequirement3(origin_options_list, destiny_options_list)
+            requirement_info = controller.Requirement3(catalog, choosen_cities)
+            time = requirement_info[0]
+            print('')
+            print('The requirement took', time, 'mseg')
+            print('')
+            PrintRequirement3(origin, destiny, requirement_info)
 
-        elif int(inputs[0]) == 4:
-            print('Requerimiento 4')
+        elif inputs == 4:
+            city = input('Enter the city: ')
+            miles = int(input('Enter the number of miles avaible: '))
+            print('Loading results...')
+            cities_options = controller.GetCitiesOptionsRequirement4(catalog, city)
+            choosen_city = PrintCitiesOptionsRequirement4(cities_options)
+            requirement_info = controller.Requirement4(catalog, choosen_city, miles)
+            time = requirement_info[0]
+            print('')
+            print('The requirement took', time, 'mseg')
+            print('')
+            PrintRequirement4(choosen_city, miles, requirement_info)
 
-        elif int(inputs[0]) == 5:
-            print('Requerimiento 5')
+        elif inputs == 5:
+            IATA = input('Enter the IATA code of the airport: ')
+            print('Loading results...')
+            requirement_info = controller.Requirement5(catalog, IATA)
+            print('')
+            print('The requirement took', time, 'mseg')
+            print('')
+            PrintRequirement5(IATA, loading_info, requirement_info)
 
-        elif int(inputs[0]) == 6:
+        elif inputs == 6:
             print('Requerimiento 6')
 
         else:
@@ -286,7 +478,7 @@ def UserProgram():
             print('Ingrese una opción válida.')
 
         printMenu()
-        inputs = input('Seleccione una opción para continuar\n')
+        inputs = int(input('Seleccione una opción para continuar\n>'))
         print('')
         
     print('Gracias por utilizar mi programa...')
