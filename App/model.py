@@ -39,17 +39,18 @@ from DISClib.Algorithms.Trees.traversal import inorder
 from DISClib.Algorithms.Graphs.dijsktra import Dijkstra
 assert cf
 
-######################################################################################################################
+###################################################################################################################################
 # Construccion de modelos
-######################################################################################################################
+###################################################################################################################################
 
 def Initialization():
     catalog = { 'graph': None,
                 'digraph': None,
+                'compl_graph': None,
                 'cities_map': None,
                 'airports_map': None,
-                'airports_list': None,
-                'routes_map': None}
+                'routes_map': None,
+                'airports_list': None}
 
     catalog['graph'] = gp.newGraph(datastructure='ADJ_LIST',
                                             directed=False,
@@ -61,7 +62,7 @@ def Initialization():
                                              size=9075,
                                              comparefunction=None)
 
-    catalog['graph_req_5'] = gp.newGraph(datastructure='ADJ_LIST',
+    catalog['compl_graph'] = gp.newGraph(datastructure='ADJ_LIST',
                                             directed=False,
                                             size=9075,
                                             comparefunction=None)
@@ -73,9 +74,9 @@ def Initialization():
 
     return catalog
 
-######################################################################################################################
+###################################################################################################################################
 # Funciones para agregar informacion al catalogo
-######################################################################################################################
+###################################################################################################################################
 
 def AddCity(catalog, city):
     city_RBT = rbt.newMap(minorcmpFunction)
@@ -93,12 +94,12 @@ def AddCity(catalog, city):
         lt.addLast(city_values_list, city_value)
         mp.put(cities_map, city_name, city_values_list)
 
-######################################################################################################################
+###################################################################################################################################
 
 def AddAirport(catalog, airport):
     airports_list = catalog['airports_list'] 
     airports_map = catalog['airports_map']
-    graph_req_5 = catalog['graph_req_5']
+    compl_graph = catalog['compl_graph']
     cities_map = catalog['cities_map']  
     digraph = catalog['digraph']
     graph = catalog['graph']
@@ -151,31 +152,30 @@ def AddAirport(catalog, airport):
         RBT_element = airport, 0
         rbt.put(city_RBT, 0, RBT_element)
 
-    element = airport_IATA, airport
-    lt.addLast(airports_list, element)
+    lt.addLast(airports_list, airport)
     mp.put(airports_map, airport_IATA, airport)
-    gp.insertVertex(graph_req_5, airport_IATA)
+    gp.insertVertex(compl_graph, airport_IATA)
     gp.insertVertex(digraph, airport_IATA)
     gp.insertVertex(graph, airport_IATA)
 
-######################################################################################################################
+###################################################################################################################################
 
 def AddRoute(catalog, route, undirected_routes_map):
+    compl_graph = catalog['compl_graph']
     routes_map = catalog['routes_map']
-    graph_req_5 = catalog['graph_req_5']
     digraph = catalog['digraph']
     graph = catalog['graph']
 
     departure_IATA = route['Departure']
-    destination_IATA = route['Destination']
     distance = float(route['distance_km'])
+    destination_IATA = route['Destination']
 
     forward_key = departure_IATA + destination_IATA
     backward_key = destination_IATA + departure_IATA
 
     mp.put(routes_map, forward_key, route)
     gp.addEdge(digraph, departure_IATA, destination_IATA, distance)
-    gp.addEdge(graph_req_5, departure_IATA, destination_IATA, distance)   
+    gp.addEdge(compl_graph, departure_IATA, destination_IATA, distance)   
 
     forward_route = mp.get(undirected_routes_map, departure_IATA + destination_IATA)
     backward_route = mp.get(undirected_routes_map, destination_IATA + departure_IATA)
@@ -185,14 +185,11 @@ def AddRoute(catalog, route, undirected_routes_map):
             if backward_route_value >= 1:
                 mp.put(undirected_routes_map, backward_key, backward_route_value - 1)
                 gp.addEdge(graph, destination_IATA, departure_IATA, distance)
-                add_num_routes_graph = 1
             else:
                 mp.put(undirected_routes_map, forward_key, 1)
                 gp.addEdge(graph, destination_IATA, departure_IATA, distance)
-                add_num_routes_graph = 1
         else:
-            mp.put(undirected_routes_map, forward_key, 1)
-            add_num_routes_graph = 0       
+            mp.put(undirected_routes_map, forward_key, 1)   
     else:
         forward_route_value = me.getValue(forward_route)
         if backward_route != None:
@@ -201,35 +198,16 @@ def AddRoute(catalog, route, undirected_routes_map):
                 mp.put(undirected_routes_map, backward_key, backward_route_value - 1)
                 mp.put(undirected_routes_map, forward_key, forward_route_value - 1)
                 gp.addEdge(graph, destination_IATA, departure_IATA, distance)
-                add_num_routes_graph = 1
             else:
                 mp.put(undirected_routes_map, forward_key, forward_route_value + 1)
-                add_num_routes_graph = 0
         else:
             mp.put(undirected_routes_map, forward_key, forward_route_value + 1)
-            add_num_routes_graph = 0  
 
-    return add_num_routes_graph 
-
-######################################################################################################################
+###################################################################################################################################
 # Funciones para creacion de datos
-######################################################################################################################
+###################################################################################################################################
 
-def GetCitiesOptionsRequirement3(catalog, origin, destiny):
-    cities_map = catalog['cities_map']
-    
-    origin_options_key_value = mp.get(cities_map, origin)
-    destiny_options_key_value = mp.get(cities_map, destiny)
-    origin_options_value = me.getValue(origin_options_key_value)
-    destiny_options_value = me.getValue(destiny_options_key_value)
-    origin_options_list = lt.iterator(origin_options_value)
-    destiny_options_list = lt.iterator(destiny_options_value)
-
-    return origin_options_list, destiny_options_list
-
-######################################################################################################################
-
-def GetCitiesOptionsRequirement4(catalog, city):
+def GetCitiesOptions(catalog, city):
     cities_map = catalog['cities_map']
 
     cities_options_key_value = mp.get(cities_map, city)
@@ -238,34 +216,43 @@ def GetCitiesOptionsRequirement4(catalog, city):
 
     return cities_options_list
 
-######################################################################################################################
+###################################################################################################################################
 # Funciones de consulta
-######################################################################################################################
+###################################################################################################################################
 
-def Requirement1(catalog, num_airports):
-    digraph = catalog['digraph']
+def Requirement1(catalog):
     airports_list = catalog['airports_list']
+    compl_graph = catalog['compl_graph']
+    digraph = catalog['digraph']
     interconnections_RBT = rbt.newMap(Requirement1cmpFunction)
 
     num_connected_airports = 0
     for airport in lt.iterator(airports_list):
-        information = airport[1]
-        IATA = airport[0]
+        IATA = airport['IATA']
         airport_indegre = gp.indegree(digraph, IATA)
         airport_outdegree = gp.outdegree(digraph, IATA)
         num_interconnections = airport_indegre + airport_outdegree
-        element = information, num_interconnections, airport_indegre, airport_outdegree
+        element = airport, num_interconnections, airport_indegre, airport_outdegree
         rbt.put(interconnections_RBT, (num_interconnections, airport_indegre, airport_outdegree), element)
         if num_interconnections > 0:
             num_connected_airports += 1
 
-    initial_requirement_list = inorder(interconnections_RBT)
-    final_requirement_list = lt.subList(initial_requirement_list, 1, num_airports)
-    requirement_list = lt.iterator(final_requirement_list)
+    requirement_list = inorder(interconnections_RBT)
 
-    return requirement_list, num_connected_airports
+    most_interconnected_airport_info = lt.getElement(requirement_list, 1)
+    most_interconnected_airport_IATA = most_interconnected_airport_info[0]['IATA']
+    most_interconnected_airport_latitude = most_interconnected_airport_info[0]['Latitude']
+    most_interconnected_airport_longitude = most_interconnected_airport_info[0]['Longitude']
+    airport_coordinates = most_interconnected_airport_latitude, most_interconnected_airport_longitude
+    print(airport_coordinates)
+
+    adjacent_airports_list = gp.adjacents(compl_graph, most_interconnected_airport_IATA)
+
+    requirement_list = lt.subList(requirement_list, 1, 5)
+
+    return lt.iterator(requirement_list), num_connected_airports, airport_coordinates, lt.iterator(adjacent_airports_list)
     
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement2(catalog, airport_1, airport_2):
     digraph = catalog['digraph']
@@ -284,7 +271,7 @@ def Requirement2(catalog, airport_1, airport_2):
 
     return airports_info_list, num_SCC, answer
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement3(catalog, choosen_cities):
     digraph = catalog['digraph']
@@ -355,7 +342,7 @@ def Requirement3(catalog, choosen_cities):
         
     return origin_airport_info, destiny_airport_info, distance, lt.iterator(trip_path_list), lt.iterator(trip_path_airports_list)
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement4(catalog, choosen_city, miles):
     routes_map = catalog['routes_map']
@@ -449,11 +436,11 @@ def Requirement4(catalog, choosen_city, miles):
 
     return airport_info, routes_path_list, num_possible_airports, max_traveling_distance, longest_path_distance, miles_need
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement5(catalog, IATA):
     airports_map = catalog['airports_map']
-    graph_req_5 = catalog['graph_req_5']
+    compl_graph = catalog['compl_graph']
     graph = catalog['graph']
     digraph = catalog['digraph']
 
@@ -463,7 +450,7 @@ def Requirement5(catalog, IATA):
     
     resulting_num_routes_graph = gp.degree(graph, IATA)
 
-    effected_airports_IATA_list = gp.adjacents(graph_req_5, IATA)
+    effected_airports_IATA_list = gp.adjacents(compl_graph, IATA)
     possible_affected_airports = lt.size(effected_airports_IATA_list)
     effected_airports_list = lt.newList('ARRAY_LIST')
     effected_airports_map = mp.newMap(possible_affected_airports)
@@ -475,12 +462,14 @@ def Requirement5(catalog, IATA):
             mp.put(effected_airports_map, airport_IATA, 0)
 
     affected_airports = lt.size(effected_airports_list)
-
+#
+#   Separar primeros y últimos 3 lugares!!!!
+#
     return lt.iterator(effected_airports_list), resulting_num_routes_digraph, resulting_num_routes_graph, affected_airports
 
-######################################################################################################################
+###################################################################################################################################
 # Funciones utilizadas para comparar elementos dentro de una lista
-######################################################################################################################
+###################################################################################################################################
 
 def minorcmpFunction(key_1, key_2):
     if key_1 >= key_2:
@@ -488,7 +477,7 @@ def minorcmpFunction(key_1, key_2):
     else:
         return -1
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement1cmpFunction(key_1, key_2):
     num_interconnections_1 = key_1[0]
@@ -512,6 +501,6 @@ def Requirement1cmpFunction(key_1, key_2):
     else:
         return -1
 
-######################################################################################################################
+###################################################################################################################################
 # Funciones de ordenamiento
-######################################################################################################################
+###################################################################################################################################

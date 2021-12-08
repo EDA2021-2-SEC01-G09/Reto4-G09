@@ -28,9 +28,9 @@ import model
 import time
 import csv
 
-######################################################################################################################
+###################################################################################################################################
 # Inicialización del Catálogo
-######################################################################################################################
+###################################################################################################################################
 
 def Initialization():
     start_time = time.process_time()
@@ -42,9 +42,9 @@ def Initialization():
 
     return elapsed_time, catalog
 
-######################################################################################################################
+###################################################################################################################################
 # Funciones para la carga de datos
-######################################################################################################################
+###################################################################################################################################
 
 def LoadData(catalog, routes_sample):
     start_time = time.process_time()
@@ -55,19 +55,19 @@ def LoadData(catalog, routes_sample):
 
     airports_info_list = LoadAirports(catalog)
     
-    routes_info = LoadRoutes(catalog, routes_sample)
+    LoadRoutes(catalog, routes_sample)
 
-
+    digraph = catalog['digraph']
     graph = catalog['graph']
     num_airports = gp.numVertices(graph)
-    num_routes_graph = routes_info[0]
-    num_routes_digraph = routes_info[1]
+    num_routes_graph = gp.numEdges(graph)
+    num_routes_digraph = gp.numEdges(digraph)
 
     stop_time = time.process_time()
     elapsed_time = (stop_time - start_time)*1000 
   
     return elapsed_time, num_cities, num_airports, num_routes_graph, num_routes_digraph, lt.iterator(airports_info_list), lt.iterator(cities_info_list)
-######################################################################################################################
+###################################################################################################################################
 
 def LoadCities(catalog):
     cities_data = cf.data_dir + 'Data/worldcities-utf8.csv'
@@ -87,7 +87,7 @@ def LoadCities(catalog):
     
     return cities_info_list, num_cities
 
-######################################################################################################################
+###################################################################################################################################
 
 def LoadAirports(catalog):
     airports_data = cf.data_dir + 'Data/airports-utf8-small.csv'
@@ -105,7 +105,7 @@ def LoadAirports(catalog):
 
     return airports_info_list
 
-######################################################################################################################
+###################################################################################################################################
 
 def LoadRoutes(catalog, routes_sample):
     routes_data = cf.data_dir + 'Data/routes-utf8-small.csv'
@@ -113,45 +113,44 @@ def LoadRoutes(catalog, routes_sample):
     reduced_list = list(input_file)[:routes_sample]
     undirected_routes_map = mp.newMap(routes_sample)
 
-    num_routes_graph = 0
-    num_routes_digraph = 0
     for route in reduced_list:
-        add_num_routes_graph = model.AddRoute(catalog, route, undirected_routes_map)
-        num_routes_graph += add_num_routes_graph
-        num_routes_digraph += 1
+        model.AddRoute(catalog, route, undirected_routes_map)
 
-    return num_routes_graph, num_routes_digraph
-
-######################################################################################################################
+###################################################################################################################################
 # Funciones para creacion de datos
-######################################################################################################################
+###################################################################################################################################
 
 def GetCitiesOptionsRequirement3(catalog, origin, destiny):
-    return model.GetCitiesOptionsRequirement3(catalog, origin, destiny)
+    origin_options_list = model.GetCitiesOptions(catalog, origin)
+    destiny_options_list = model.GetCitiesOptions(catalog, destiny)
 
-######################################################################################################################
+    return origin_options_list, destiny_options_list
+
+###################################################################################################################################
 
 def GetCitiesOptionsRequirement4(catalog, city):
-    return model.GetCitiesOptionsRequirement4(catalog, city)
+    return model.GetCitiesOptions(catalog, city)
 
-######################################################################################################################
+###################################################################################################################################
 # Funciones de consulta sobre el catálogo
-######################################################################################################################
+###################################################################################################################################
 
-def Requirement1(catalog, num_top_airports):
+def Requirement1(catalog):
 
     start_time = time.process_time()
 
-    requirement_info = model.Requirement1(catalog, num_top_airports)
+    requirement_info = model.Requirement1(catalog)
     requirement_list = requirement_info[0]
     num_connected_airports = requirement_info[1]
+    airport_coordinates = requirement_info[2]
+    adjacent_airports_list = requirement_info[3]
 
     stop_time = time.process_time()
     elapsed_time = (stop_time - start_time)*1000 
 
-    return elapsed_time, requirement_list, num_connected_airports
+    return elapsed_time, requirement_list, num_connected_airports, airport_coordinates, adjacent_airports_list
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement2(catalog, airport_1, airport_2):
 
@@ -167,7 +166,7 @@ def Requirement2(catalog, airport_1, airport_2):
 
     return elapsed_time, airports_info_list, num_SCC, answer
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement3(catalog, choosen_cities):
     start_time = time.process_time()
@@ -184,7 +183,7 @@ def Requirement3(catalog, choosen_cities):
 
     return elapsed_time, origin_airport_info, destiny_airport_info, distance, trip_path_list, trip_path_airports_list
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement4(catalog, choosen_city, miles):
     start_time = time.process_time()
@@ -202,7 +201,7 @@ def Requirement4(catalog, choosen_city, miles):
 
     return elapsed_time, airport_info, lt.iterator(routes_path_list), num_possible_airports, max_traveling_distance, longest_path_distance, miles_need
 
-######################################################################################################################
+###################################################################################################################################
 
 def Requirement5(catalog, IATA):
     start_time = time.process_time()
