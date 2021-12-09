@@ -39,9 +39,9 @@ from DISClib.Algorithms.Trees.traversal import inorder
 from DISClib.Algorithms.Graphs.dijsktra import Dijkstra
 assert cf
 
-###################################################################################################################################
+###########################################################################
 # Construccion de modelos
-###################################################################################################################################
+###########################################################################
 
 def Initialization():
     catalog = { 'graph': None,
@@ -74,9 +74,9 @@ def Initialization():
 
     return catalog
 
-###################################################################################################################################
+###########################################################################
 # Funciones para agregar informacion al catalogo
-###################################################################################################################################
+###########################################################################
 
 def AddCity(catalog, city):
     city_RBT = rbt.newMap(minorcmpFunction)
@@ -94,7 +94,7 @@ def AddCity(catalog, city):
         lt.addLast(city_values_list, city_value)
         mp.put(cities_map, city_name, city_values_list)
 
-###################################################################################################################################
+###########################################################################
 
 def AddAirport(catalog, airport):
     airports_list = catalog['airports_list'] 
@@ -158,7 +158,7 @@ def AddAirport(catalog, airport):
     gp.insertVertex(digraph, airport_IATA)
     gp.insertVertex(graph, airport_IATA)
 
-###################################################################################################################################
+###########################################################################
 
 def AddRoute(catalog, route, undirected_routes_map):
     compl_graph = catalog['compl_graph']
@@ -170,6 +170,29 @@ def AddRoute(catalog, route, undirected_routes_map):
     distance = float(route['distance_km'])
     destination_IATA = route['Destination']
 
+    if gp.getEdge(digraph, departure_IATA, destination_IATA) == None:
+        if gp.getEdge(digraph, destination_IATA, departure_IATA) != None:
+            if gp.getEdge(graph, destination_IATA, departure_IATA) == None:
+                add_num_edges_digraph = 1
+                add_num_edgees_graph = 1
+            else:
+                add_num_edges_digraph = 1
+                add_num_edgees_graph = 0
+        else:
+            add_num_edges_digraph = 1
+            add_num_edgees_graph = 0
+    else:
+        if gp.getEdge(digraph, destination_IATA, departure_IATA) != None:
+            if gp.getEdge(graph, destination_IATA, departure_IATA) == None:
+                add_num_edges_digraph = 0
+                add_num_edgees_graph = 1
+            else:
+                add_num_edges_digraph = 0
+                add_num_edgees_graph = 0
+        else:
+            add_num_edges_digraph = 0
+            add_num_edgees_graph = 0
+
     forward_key = departure_IATA + destination_IATA
     backward_key = destination_IATA + departure_IATA
 
@@ -179,6 +202,7 @@ def AddRoute(catalog, route, undirected_routes_map):
 
     forward_route = mp.get(undirected_routes_map, departure_IATA + destination_IATA)
     backward_route = mp.get(undirected_routes_map, destination_IATA + departure_IATA)
+
     if forward_route == None:
         if backward_route != None:
             backward_route_value = me.getValue(backward_route)
@@ -203,9 +227,11 @@ def AddRoute(catalog, route, undirected_routes_map):
         else:
             mp.put(undirected_routes_map, forward_key, forward_route_value + 1)
 
-###################################################################################################################################
+    return add_num_edges_digraph, add_num_edgees_graph
+
+###########################################################################
 # Funciones para creacion de datos
-###################################################################################################################################
+###########################################################################
 
 def GetCitiesOptions(catalog, city):
     cities_map = catalog['cities_map']
@@ -216,13 +242,12 @@ def GetCitiesOptions(catalog, city):
 
     return cities_options_list
 
-###################################################################################################################################
+###########################################################################
 # Funciones de consulta
-###################################################################################################################################
+###########################################################################
 
 def Requirement1(catalog):
     airports_list = catalog['airports_list']
-    compl_graph = catalog['compl_graph']
     digraph = catalog['digraph']
     interconnections_RBT = rbt.newMap(Requirement1cmpFunction)
 
@@ -238,21 +263,11 @@ def Requirement1(catalog):
             num_connected_airports += 1
 
     requirement_list = inorder(interconnections_RBT)
-
-    most_interconnected_airport_info = lt.getElement(requirement_list, 1)
-    most_interconnected_airport_IATA = most_interconnected_airport_info[0]['IATA']
-    most_interconnected_airport_latitude = most_interconnected_airport_info[0]['Latitude']
-    most_interconnected_airport_longitude = most_interconnected_airport_info[0]['Longitude']
-    airport_coordinates = most_interconnected_airport_latitude, most_interconnected_airport_longitude
-    print(airport_coordinates)
-
-    adjacent_airports_list = gp.adjacents(compl_graph, most_interconnected_airport_IATA)
-
     requirement_list = lt.subList(requirement_list, 1, 5)
 
-    return lt.iterator(requirement_list), num_connected_airports, airport_coordinates, lt.iterator(adjacent_airports_list)
+    return lt.iterator(requirement_list), num_connected_airports
     
-###################################################################################################################################
+###########################################################################
 
 def Requirement2(catalog, airport_1, airport_2):
     digraph = catalog['digraph']
@@ -271,7 +286,7 @@ def Requirement2(catalog, airport_1, airport_2):
 
     return airports_info_list, num_SCC, answer
 
-###################################################################################################################################
+###########################################################################
 
 def Requirement3(catalog, choosen_cities):
     digraph = catalog['digraph']
@@ -312,12 +327,12 @@ def Requirement3(catalog, choosen_cities):
         index_1 += 1
 
     if path:  
-        trip_path_airports_list = lt.newList('ARRAY_LIST')
-        trip_path_list = lt.newList('ARRAY_LIST')
+        routes_airports_list = lt.newList('ARRAY_LIST')
+        routes_list = lt.newList('ARRAY_LIST')
 
         destiny_airport_info_key_value = mp.get(airports_map, destiny_airport_IATA)
         destiny_airport_info = me.getValue(destiny_airport_info_key_value)
-        lt.addLast(trip_path_airports_list, destiny_airport_info)
+        lt.addLast(routes_airports_list, destiny_airport_info)
 
         route = path['edgeTo']
         while route != None:
@@ -326,23 +341,27 @@ def Requirement3(catalog, choosen_cities):
             route_key = departure + destination
             route_info_key_value = mp.get(routes_map, route_key)
             route_info = me.getValue(route_info_key_value)
-            lt.addLast(trip_path_list, route_info)
+            lt.addLast(routes_list, route_info)
 
             departure_airport_info_key_value = mp.get(airports_map, departure)
             departure_airport_info = me.getValue(departure_airport_info_key_value)
-            lt.addLast(trip_path_airports_list, departure_airport_info)
+            lt.addLast(routes_airports_list, departure_airport_info)
             
             path_key_value = mp.get(Dijkstra_path['visited'], departure)
             path = me.getValue(path_key_value)
             route = path['edgeTo']
     else:
         distance = 0
-        trip_path_list = lt.newList('ARRAY_LIST')
-        trip_path_airports_list = lt.newList('ARRAY_LIST')
-        
-    return origin_airport_info, destiny_airport_info, distance, lt.iterator(trip_path_list), lt.iterator(trip_path_airports_list)
+        routes_list = lt.newList('ARRAY_LIST')
+        routes_airports_list = lt.newList('ARRAY_LIST')
 
-###################################################################################################################################
+    end_airports_list = lt.newList('ARRAY_LIST')
+    lt.addLast(end_airports_list, origin_airport_info)
+    lt.addLast(end_airports_list, destiny_airport_info)
+        
+    return lt.iterator(end_airports_list), distance, lt.iterator(routes_list), lt.iterator(routes_airports_list)
+
+###########################################################################
 
 def Requirement4(catalog, choosen_city, miles):
     routes_map = catalog['routes_map']
@@ -351,6 +370,9 @@ def Requirement4(catalog, choosen_city, miles):
     airports_list_city = inorder(city_RBT)
     airport_info = lt.getElement(airports_list_city, 1)[0]
     IATA = airport_info['IATA']
+
+    airport_list = lt.newList('ARRAY_LIST')
+    lt.addLast(airport_list, airport_info)
 
     search = prim.initSearch(graph)
     prim_structure = prim.prim(graph, search, IATA)
@@ -412,7 +434,7 @@ def Requirement4(catalog, choosen_city, miles):
                 mp.put(airports_path_map, airport_path_IATA, (counter, total_distance))
                 counter -= 1
 
-    routes_path_list = lt.newList('ARRAY_LIST')
+    routes_list = lt.newList('ARRAY_LIST')
     current_node = major_leaf
     current_path_key_value = mp.get(edge_To_map, current_node)
     current_path_info = me.getValue(current_path_key_value)
@@ -424,7 +446,7 @@ def Requirement4(catalog, choosen_city, miles):
         route_key = father_node + current_node
         route_info_key_value = mp.get(routes_map, route_key)
         route_info = me.getValue(route_info_key_value)
-        lt.addLast(routes_path_list, route_info)
+        lt.addLast(routes_list, route_info)
         longest_path_distance += route_distance
         current_path_key_value = mp.get(edge_To_map, father_node)
         current_path_info = me.getValue(current_path_key_value)
@@ -434,9 +456,9 @@ def Requirement4(catalog, choosen_city, miles):
 
     miles_need = (5/8)*(longest_path_distance*2 - miles*1.6)
 
-    return airport_info, routes_path_list, num_possible_airports, max_traveling_distance, longest_path_distance, miles_need
+    return lt.iterator(airport_list), lt.iterator(routes_list), num_possible_airports, max_traveling_distance, longest_path_distance, miles_need
 
-###################################################################################################################################
+###########################################################################
 
 def Requirement5(catalog, IATA):
     airports_map = catalog['airports_map']
@@ -452,24 +474,30 @@ def Requirement5(catalog, IATA):
 
     effected_airports_IATA_list = gp.adjacents(compl_graph, IATA)
     possible_affected_airports = lt.size(effected_airports_IATA_list)
-    effected_airports_list = lt.newList('ARRAY_LIST')
+    airports_list = lt.newList('ARRAY_LIST')
     effected_airports_map = mp.newMap(possible_affected_airports)
     for airport_IATA in lt.iterator(effected_airports_IATA_list):
         airport_key_value = mp.get(airports_map, airport_IATA)
         airport_info = me.getValue(airport_key_value)
         if mp.get(effected_airports_map, airport_IATA) == None:
-            lt.addLast(effected_airports_list, airport_info)
+            lt.addLast(airports_list, airport_info)
             mp.put(effected_airports_map, airport_IATA, 0)
 
-    affected_airports = lt.size(effected_airports_list)
-#
-#   Separar primeros y últimos 3 lugares!!!!
-#
-    return lt.iterator(effected_airports_list), resulting_num_routes_digraph, resulting_num_routes_graph, affected_airports
+    num_affected_airports = lt.size(airports_list)
 
-###################################################################################################################################
+    if num_affected_airports > 6:
+        definitive_airports_list = lt.subList(airports_list, 1, 3)
+        last_airports_list = lt.subList(airports_list, num_affected_airports - 2, 3)
+        for airport in lt.iterator(last_airports_list):
+            lt.addLast(definitive_airports_list, airport)
+    else:
+        definitive_airports_list = airports_list
+#
+    return lt.iterator(definitive_airports_list), resulting_num_routes_digraph, resulting_num_routes_graph, num_affected_airports
+
+###########################################################################
 # Funciones utilizadas para comparar elementos dentro de una lista
-###################################################################################################################################
+###########################################################################
 
 def minorcmpFunction(key_1, key_2):
     if key_1 >= key_2:
@@ -477,7 +505,7 @@ def minorcmpFunction(key_1, key_2):
     else:
         return -1
 
-###################################################################################################################################
+###########################################################################
 
 def Requirement1cmpFunction(key_1, key_2):
     num_interconnections_1 = key_1[0]
@@ -500,7 +528,3 @@ def Requirement1cmpFunction(key_1, key_2):
             return -1
     else:
         return -1
-
-###################################################################################################################################
-# Funciones de ordenamiento
-###################################################################################################################################
