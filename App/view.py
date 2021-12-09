@@ -105,7 +105,7 @@ def PrintCitiesOptions(city_options_list, test):
             city_options_dict[counter] = city_option
             counter += 1
         print('+' + 9*'-' + '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-'+ '+' + 25*'-' + '+' + 25*'-' + '+' + 25*'-' + '+')
-        city_choise = int(input('Enter the departure city option: '))
+        city_choise = int(input('Enter the city option: '))
         choosen_city = city_options_dict[city_choise]
 
     return choosen_city
@@ -351,11 +351,11 @@ def UserProgram():
         elif inputs == 3:
             origin = input('Enter the departure city: ')
             destiny = input('Enter the destination city: ')
-            print('Loading results...')
             cities_options = controller.GetCitiesOptionsRequirement3(catalog, origin, destiny)
             origin_options_list = cities_options[0]
             destiny_options_list = cities_options[1]
             choosen_cities = PrintCitiesOptionsRequirement3(origin_options_list, destiny_options_list)
+            print('Loading results...')
             requirement_info = controller.Requirement3(catalog, choosen_cities)
             time = requirement_info[0]
             print('')
@@ -366,9 +366,9 @@ def UserProgram():
         elif inputs == 4:
             city = input('Enter the city: ')
             miles = int(input('Enter the number of miles avaible: '))
-            print('Loading results...')
             cities_options = controller.GetCitiesOptionsRequirement4(catalog, city)
             choosen_city = PrintCitiesOptionsRequirement4(cities_options)
+            print('Loading results...')
             requirement_info = controller.Requirement4(catalog, choosen_city, miles)
             time = requirement_info[0]
             print('')
